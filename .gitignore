@@ -1,0 +1,15 @@
+*.log
+*.cci
+*.rte
+*.cfg
+*.fct
+*.DO
+*.EDF
+*.sts
+*.hci
+*.LBK
+*.cbi
+*.cof
+*.DBK
+*.PWI
+*~ 
