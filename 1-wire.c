@@ -16,7 +16,7 @@ delay_us(420);
 return BUS_State;
 }
 
-void W1_Tx_bit (unsigned char Tx_Bit)   // Write one BIT on 1-wire BUS 
+void W1_Tx_bit (unsigned char Tx_Bit)   // Write one BIT on 1-wire BUS
 {
 DDRB.0 = 0xFF;
 delay_us(2);
@@ -59,4 +59,4 @@ for (w=0;w<=7;w++)
     Tx_Byte = Tx_Byte >> 1;
     }
 }
-#pragma used- 
+#pragma used-

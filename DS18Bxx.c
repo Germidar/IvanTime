@@ -10,7 +10,8 @@ void Match_ROM (unsigned ROM_number);
 void Skip_ROM (void);
 void Alarm_Search ();
 void Convert_T (void);
-signed int Write_Scratchpad (void);
+signed int Pidarastiya (void);
+void Write_Scratchpad ();
 void Read_Scratchpad ();
 void Copy_Scratchpad ();
 void Recall_E ();
@@ -19,7 +20,47 @@ unsigned int Get_Temperature (unsigned char dev_numb);
 
 unsigned char Search_ROM ()
 {
-unsigned char dev_count = 0xDD;
+unsigned char dev_count = 0x00;
+unsigned char rBit, count_bit = 0x00, count_byte = 0x00;
+if (W1_Reset())
+    {
+    W1_Tx(0xF0);
+    for (count_byte = 0x00; count_byte < 9; count_byte++)
+        {
+        for (count_bit = 0x00; count_bit < 8; count_bit++)
+            {
+            rBit = W1_Rx(2);
+            switch (rBit)
+                {
+                case 0x00:
+
+                break;
+
+                case 0x01:
+                ROM[count_byte] |= 0x01 << count_bit;
+                W1_Tx_bit(0x01);
+                break;
+
+                case 0x02:
+                ROM[count_byte] |= 0x00 << count_bit;
+                W1_Tx_bit(0x00);
+                break;
+
+                case 0x03:
+
+                break;
+
+                default:
+
+                }
+            }
+        }
+    }
+else
+    {
+
+    }
+
 return dev_count;
 }
 
@@ -60,7 +101,7 @@ void Convert_T (void)
 W1_Tx(0x44);
 }
 
-signed int Write_Scratchpad (void)                // «читуванн€ 9 б≥т≥в EEPROM DS18B20+
+signed int Pidarastiya (void)                // «читуванн€ 9 б≥т≥в EEPROM DS18B20+
 {
 unsigned char scrp [9];
 unsigned char x = 0x00;
@@ -77,19 +118,24 @@ z |= 0x00FF & scrp[0];
 return z;
 }
 
+void Write_Scratchpad ()
+{
+W1_Tx(0x4E);
+}
+
 void Read_Scratchpad ()
 {
-
+W1_Tx(0xBE);
 }
 
 void Copy_Scratchpad ()
 {
-
+W1_Tx(0x48);
 }
 
 void Recall_E ()
 {
-
+W1_Tx(0xB8);
 }
 
 unsigned char Read_Power_Supply (void)
@@ -110,7 +156,7 @@ if (W1_Reset() == 0x01)
     delay_ms(810);
     W1_Reset();
     Skip_ROM();
-    tC = Write_Scratchpad();    
+    tC = Pidarastiya();
     }
 else
     {
@@ -141,9 +187,9 @@ else
         {
         Sys_Temp[0] = i_tmp / 100;
         Sys_Temp[1] = (i_tmp - 100) / 10;
-        Sys_Temp[2] = (i_tmp - 100) % 10;        
+        Sys_Temp[2] = (i_tmp - 100) % 10;
         }
-    else    
+    else
         {
         Sys_Temp[0] = 28;
         plus:
@@ -155,7 +201,7 @@ else
             }
         Sys_Temp[2] = i_tmp % 10;
         }
-    Sys_Temp[3] = (temperature - i_tmp) * 10; 
+    Sys_Temp[3] = (temperature - i_tmp) * 10;
     }
 }
 

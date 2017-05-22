@@ -43,20 +43,21 @@ else
 
 void Set_RTC_time (void)
 {
-I2C_Buff[0] = 0b11010000;
-I2C_Buff[1] = 0x00;
-TWI_SendData(I2C_Buff,2);
+//I2C_Buff[0] = 0b11010000;
+//I2C_Buff[1] = 0x00;
+//TWI_SendData(I2C_Buff,2);
 #asm("cli")
-I2C_Buff[1] = ((System_time[2] / 10) << 4) | (System_time[2] % 10);
-I2C_Buff[2] = ((System_time[1] / 10) << 4) | (System_time[1] % 10);
-I2C_Buff[3] = ((System_time[0] / 10) << 4) | (System_time[0] % 10);
-I2C_Buff[4] =   System_date[3];
-I2C_Buff[5] = ((System_date[0] / 10) << 4) | (System_date[0] % 10);
-I2C_Buff[6] = ((System_date[1] / 10) << 4) | (System_date[1] % 10);
-I2C_Buff[7] = ((System_date[2] / 10) << 4) | (System_date[2] % 10);
+I2C_Buff[2] = ((System_time[2] / 10) << 4) | (System_time[2] % 10);
+I2C_Buff[3] = ((System_time[1] / 10) << 4) | (System_time[1] % 10);
+I2C_Buff[4] = ((System_time[0] / 10) << 4) | (System_time[0] % 10);
+I2C_Buff[5] =   System_date[3];
+I2C_Buff[6] = ((System_date[0] / 10) << 4) | (System_date[0] % 10);
+I2C_Buff[7] = ((System_date[1] / 10) << 4) | (System_date[1] % 10);
+I2C_Buff[8] = ((System_date[2] / 10) << 4) | (System_date[2] % 10);
 #asm("sei")
 I2C_Buff[0] = 0b11010000;
-TWI_SendData(I2C_Buff,8);
+I2C_Buff[1] = 0x00;
+TWI_SendData(I2C_Buff,9);
 }
 
 void SysTime_incr (void)                        // Системний час

@@ -423,7 +423,7 @@ else
     }
 if ((Display_System_Status < 0x03) & button[2] > 0x00 & button_hold[2] > 0x00)
     {
-    if (button_hold[2] < 0x12)
+    if (button_hold[2] < 0x05)
         {
         Display_System_Status = 0x02;
         }
@@ -486,26 +486,22 @@ else
         }
     }
 
-if (button[0] > 0x8FFF)
+if (button[0] > 0x7FFF)
     {
     push_button_K();
     button[0] = 0x01;
     }
-if (button[1] > 0x8FFF)
+if (button[1] > 0x7FFF)
     {
     push_button_L();
     button[1] = 0x01;
     }
-if (button[2] > 0x8FFF)
+if (button[2] > 0x7FFF)
     {
     push_button_M();
     button[2] = 0x01;
     }
 }
-//interrupt [TIM2_COMP] void timer2_comp_isr(void)
-//{
-//
-//}
 
 void main (void)
 {
