@@ -12,4 +12,15 @@
 *.cof
 *.DBK
 *.PWI
+*.c~
+*.prj~
+*.LYT
+*.cproj
+*.bmp
+*.aps
+*.aws
+Exe/
+Linker/
+List/
+Obj/
 *~ 

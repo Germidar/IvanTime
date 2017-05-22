@@ -1,6 +1,8 @@
 #pragma used+
 unsigned char ROM [9];
-unsigned char Sys_Temp[2];
+signed int Sys_tmp;
+unsigned char Sys_Temp[4] = {28,28,18,28};
+float temperature;
 
 unsigned char Search_ROM ();
 void Read_ROM (void);
@@ -8,7 +10,7 @@ void Match_ROM (unsigned ROM_number);
 void Skip_ROM (void);
 void Alarm_Search ();
 void Convert_T (void);
-unsigned int Write_Scratchpad (void);
+signed int Write_Scratchpad (void);
 void Read_Scratchpad ();
 void Copy_Scratchpad ();
 void Recall_E ();
@@ -58,22 +60,20 @@ void Convert_T (void)
 W1_Tx(0x44);
 }
 
-unsigned int Write_Scratchpad (void)                // «читуванн€ 9 б≥т≥в EEPROM DS18B20+
+signed int Write_Scratchpad (void)                // «читуванн€ 9 б≥т≥в EEPROM DS18B20+
 {
 unsigned char scrp [9];
 unsigned char x = 0x00;
-unsigned int z;
+signed int z;
 W1_Tx(0xBE);
 while(x<8)
     {
     scrp[x] = W1_Rx(8);
     x++;
     }
-z = (0x0F & scrp[0]);
-z = z << 8;
-x = (scrp[0] >> 4);
-x |= (0xF0 & scrp[1] << 4);
-z |= 0x00FF & x;
+z = scrp[1] << 8;
+z |= 0x00FF & scrp[0];
+
 return z;
 }
 
@@ -117,6 +117,46 @@ else
 
     }
 return tC;
+}
+
+void Gov_No (void)
+{
+signed int i_tmp;
+Sys_tmp = Get_Temperature(1);
+i_tmp = Sys_tmp >> 4;
+temperature = i_tmp + (Sys_tmp & 0x000F) * 0.0625;
+
+if (temperature < 0)
+    {
+    Sys_tmp ^= 0xFFFF;
+    Sys_tmp++;
+    i_tmp = Sys_tmp >> 4;
+    temperature = i_tmp + (Sys_tmp & 0x000F) * 0.0625;
+    Sys_Temp[0] = 27;
+    goto plus;
+    }
+else
+    {
+    if (i_tmp > 99)
+        {
+        Sys_Temp[0] = i_tmp / 100;
+        Sys_Temp[1] = (i_tmp - 100) / 10;
+        Sys_Temp[2] = (i_tmp - 100) % 10;        
+        }
+    else    
+        {
+        Sys_Temp[0] = 28;
+        plus:
+        Sys_Temp[1] = i_tmp / 10;
+        if (Sys_Temp[1] < 1)
+            {
+            Sys_Temp[1] = Sys_Temp[0];
+            Sys_Temp[0] = 28;
+            }
+        Sys_Temp[2] = i_tmp % 10;
+        }
+    Sys_Temp[3] = (temperature - i_tmp) * 10; 
+    }
 }
 
 #pragma used-

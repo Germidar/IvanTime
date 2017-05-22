@@ -32,7 +32,7 @@ unsigned char ASCtoDig (unsigned char ASC)  // Перетворення ASCII сииволів у Hex
     switch (ASC)
         {
         case 0x30: TMPS = 0x00; break;
-        case 0x31: TMPS = 0x01; break;     
+        case 0x31: TMPS = 0x01; break;
         case 0x32: TMPS = 0x02; break;
         case 0x33: TMPS = 0x03; break;
         case 0x34: TMPS = 0x04; break;
@@ -41,12 +41,12 @@ unsigned char ASCtoDig (unsigned char ASC)  // Перетворення ASCII сииволів у Hex
         case 0x37: TMPS = 0x07; break;
         case 0x38: TMPS = 0x08; break;
         case 0x39: TMPS = 0x09; break;
-        case 0x41: TMPS = 0x0A; break; 
-        case 0x42: TMPS = 0x0B; break;     
-        case 0x43: TMPS = 0x0C; break; 
-        case 0x44: TMPS = 0x0D; break;    
-        case 0x45: TMPS = 0x0E; break; 
-        case 0x46: TMPS = 0x0F; break;     
+        case 0x41: TMPS = 0x0A; break;
+        case 0x42: TMPS = 0x0B; break;
+        case 0x43: TMPS = 0x0C; break;
+        case 0x44: TMPS = 0x0D; break;
+        case 0x45: TMPS = 0x0E; break;
+        case 0x46: TMPS = 0x0F; break;
         }
     return TMPS;
     }
@@ -56,7 +56,7 @@ unsigned char DigtoASC (unsigned char Dig)  // Перетворення чисел з Hex системми
     unsigned char TMPS;
     switch (Dig)
         {
-        case 0x00: TMPS = 0x30; break; 
+        case 0x00: TMPS = 0x30; break;
         case 0x01: TMPS = 0x31; break;
         case 0x02: TMPS = 0x32; break;
         case 0x03: TMPS = 0x33; break;
@@ -83,7 +83,7 @@ SysTime_incr();
 //----- Двійково-десятковий формат збереження даних
 if ((0x0F & Sec) >= 0x09)
     {
-    Sec &= 0xF0;                   
+    Sec &= 0xF0;
     if ((0xF0 & Sec) >= 0x50)
         {
         Sec = 0x00;
@@ -149,7 +149,7 @@ if ((0x0F & Sec) >= 0x09)
                         {
                         Hour++;
                         }
-                    }                
+                    }
                 }
             else
                 {
@@ -179,7 +179,7 @@ else
 //        Min = 0x00;
 //        if (Hour >= 23)
 //            {
-//            Hour = 0x00;          
+//            Hour = 0x00;
 //            if (Day >= 7)
 //                {
 //                Day = 0x01;
@@ -269,7 +269,7 @@ Day = RTC_Data[3]; // День неділі
 Dat = (10 * (RTC_Data[4] >> 4)) + (0b00001111 & RTC_Data[4]); // Переклад з BDC y BIN Число
 Mounth = (10 * (RTC_Data[5] >> 4)) + (0b00001111 & RTC_Data[5]); // Переклад з BDC y BIN Місяць
 Year = (10 * (RTC_Data[6] >> 4)) + (0b00001111 & RTC_Data[6]); // Переклад з BDC y BIN Рік
-}         
+}
 
 interrupt [TIM2_COMP] void timer2_comp_isr(void) // Оновлення дисплею
 {
@@ -345,5 +345,5 @@ Get_RTC_time();
 while(1)
     {
 
-    }   
+    }
 }

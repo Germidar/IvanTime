@@ -10,7 +10,7 @@ if (cfg_pwm & 0x01)
     {
     TCCR2 = 0b11101010;     //(1<<PWM2) | (0<<COM21) | (1<<COM20) | (1<<CTC2) | (0<<CS22) | (1<<CS21) | (0<<CS20);
     OCR2 = brightness;
-    PORTB.5 = 0xFF;          // Розібратися з дригами піна
+    PORTB.5 = 0xFF;
     }
 }
 
