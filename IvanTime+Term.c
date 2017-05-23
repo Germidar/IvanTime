@@ -7,7 +7,7 @@
 #include <DS18Bxx.c>
 
 
-unsigned char Disp[16];      //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    Пн    Вт    Ср    Чт    Пт    Сб    Нд    -    " "
+unsigned char Disp[9];      //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    Пн    Вт    Ср    Чт    Пт    Сб    Нд    -    " "
 flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0xBF, 0x86, 0xDB, 0xCF, 0xE6, 0xED, 0xFD, 0x87, 0xFF, 0xEF, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x40, 0x00};     //Оголошення масиву символів від 0 до 9 СC
 
 
@@ -54,13 +54,13 @@ switch (Display_System_Status)
     Disp[8] = System_date[3] + 19; //Дні неділі
 
     //--- debug mode begin
-    Disp[9] = TEMP;    // space in debug first
-    Disp[10] = System_date[0] / 10;         //Dat Dec
-    Disp[11] = System_date[0] % 10 +10;     //Dat ED
-    Disp[12] = System_date[1] / 10;         //Mounth Dec
-    Disp[13] = System_date[1] % 10 +10;     //Mounth ED
-    Disp[14] = System_date[2] / 10;         //Year Dec
-    Disp[15] = System_date[2] % 10;         //Year ED
+//    Disp[9] = TEMP;    // space in debug first
+//    Disp[10] = System_date[0] / 10;         //Dat Dec
+//    Disp[11] = System_date[0] % 10 +10;     //Dat ED
+//    Disp[12] = System_date[1] / 10;         //Mounth Dec
+//    Disp[13] = System_date[1] % 10 +10;     //Mounth ED
+//    Disp[14] = System_date[2] / 10;         //Year Dec
+//    Disp[15] = System_date[2] % 10;         //Year ED
     //--- debug mode end
 
     if (0x00 == System_time[2] % 0x02)      // Блимач
@@ -181,7 +181,7 @@ rt_sec++;
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)  // Оновлення дисплею + Sound multipler
 {
 TCNT0=0xA2; // 0xA2 - 3,008 ms
-if (PORTC >=0x0F)   //Standart 0x08
+if (PORTC >=0x08)   //Standart 0x08; Debug 0x0F
     {
     PORTC = 0x00;
     xscr = 0x00;
@@ -214,9 +214,9 @@ else
 
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)  // 1000 ms
 {
-SysTime_incr();
-Get_sys_temp();
-Display_refr();
+SysTime_incr();     // Функція ходу годинника
+Get_sys_temp();     // Інкремент для опитування датчиків температури
+Display_refr();     // Оновлення буферу даних для дисплею
 
 }
 
@@ -486,7 +486,7 @@ else
         }
     }
 
-if (button[0] > 0x7FFF)
+if (button[0] > 0x7FFF)     // Аппаратні затримки для усунення брязкоту контактів (зробити аппаратний захист.)
     {
     push_button_K();
     button[0] = 0x01;
@@ -510,8 +510,8 @@ DDRC = 0x0F;
 DDRD = 0xFF; // Segments
 
 //#asm("cli")
-EEPROM_write (0x0001, 0x12);
-EEPROM_write (0x0002, 0x7A);
+//EEPROM_write (0x0001, 0x12);
+//EEPROM_write (0x0002, 0x7A);
 //#asm("sei")
 
 // Timer/Counter 2 initialization
@@ -527,8 +527,8 @@ TCNT1H=0x00;
 TCNT1L=0x00;
 ICR1H=0x00;
 ICR1L=0x00;
-OCR1AH=EEPROM_read (0x0002);  // 0x7A
-OCR1AL=EEPROM_read (0x0001);  // 0x12
+OCR1AH=0x7A;    //EEPROM_read (0x0002);  // 0x7A
+OCR1AL=0x12;    //EEPROM_read (0x0001);  // 0x12
 OCR1BH=0x00;
 OCR1BL=0x00;
 
@@ -543,6 +543,7 @@ TCNT0=0xA2;
 
 TWI_MasterInit(100);
 Get_RTC_time();
+Display_refr();     // Для запобігання нулів при увімкненні живлення
 TIMSK=0x11; // був - 91 потом 11
 
 while(1)

@@ -10,5 +10,5 @@ Create project
 #5 19.03.2017 added 2 files
 #6 20.03.2017
 #7 25.03.2017
-#8
-#9
+#8 14.03.2017 added new function push button and PWM change mode.
+#9 24.05.2017 removed debug display data, Fix start-up zero on led
