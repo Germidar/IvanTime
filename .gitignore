@@ -20,6 +20,8 @@
 *.aps
 *.aws
 *.dmp
+*.i
+Debug/
 Exe/
 Linker/
 List/

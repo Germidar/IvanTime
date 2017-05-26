@@ -18,6 +18,11 @@ unsigned int button[3];
 unsigned char button_hold[3];
 unsigned int TEMP = 0x00;
 
+void reset_system (void)
+{
+#asm("rjmp 0") //test_program_reset
+}
+
 void EEPROM_write (unsigned int uiAddress, unsigned char ucData)
 {
 while(EECR & (1<<EEWE));
@@ -543,7 +548,7 @@ TCNT0=0xA2;
 
 TWI_MasterInit(100);
 Get_RTC_time();
-Display_refr();     // Для запобігання нулів при увімкненні живлення
+Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
 TIMSK=0x11; // був - 91 потом 11
 
 while(1)
