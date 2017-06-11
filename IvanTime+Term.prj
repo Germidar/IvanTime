@@ -6,7 +6,7 @@ A=
 C=
 D=06.01.2015 18:07:35
 Files=1
-OpenedFiles=4
+OpenedFiles=3
 OutputListFilesDirectory=List
 OutputObjectFilesDirectory=Obj
 OutputExecutableFilesDirectory=Exe
@@ -21,7 +21,7 @@ PageIndex0=0
 OF1=IvanTime+Term.c
 Active1=1
 EditorPanel1=0
-TimeStamp1=1253770355
+TimeStamp1=1254850294
 PageIndex1=1
 ActiveTab=1
 ActiveBuildConfiguration=0
@@ -29,15 +29,15 @@ DebugOutputListFilesDirectory=Debug\List
 DebugOutputObjectFilesDirectory=Debug
 DebugOutputExecutableFilesDirectory=Debug\Exe
 DebugOutputLinkerFilesDirectory=Debug\Link
-OF2=DS18Bxx.c
+OF2=Time_and_Clock.c
 Active2=0
 EditorPanel2=0
-TimeStamp2=1250689742
+TimeStamp2=1250473755
 PageIndex2=2
-OF3=1-wire.c
+OF3=timer_mode_manager.c
 Active3=0
 EditorPanel3=0
-TimeStamp3=1250538025
+TimeStamp3=1249423182
 PageIndex3=3
 OF4=Debug\List\IvanTime+Term.asm
 Active4=0
@@ -142,7 +142,7 @@ WarningUnknownPragma=1
 LinkerWarnings=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-Build=840
+Build=843
 UseEEPROMLocation0=1
 IncludePath0=
 IncludePath1=
@@ -373,8 +373,8 @@ WaitUserProgFinish=1
 Row=0
 Column=0
 ScrollPosX=0
-ScrollPosY=33
-TimeStamp=1253770376
+ScrollPosY=51
+TimeStamp=1254850401
 [BookmarksFoldedCode]
 Files=18
 F1=D:\AVR\IvanTime\IvanTime+Term.c
@@ -414,11 +414,11 @@ BK9=-1
 [FoldedCode1]
 Blocks=0
 [Bookmarks2]
-TimeStamp=1253770355
-Row=464
-Column=0
+TimeStamp=1254850294
+Row=513
+Column=18
 ScrollPosX=0
-ScrollPosY=463
+ScrollPosY=495
 BK0=-1
 BK1=-1
 BK2=-1
@@ -432,7 +432,7 @@ BK9=-1
 [CompilerDebug]
 RebuildAll=0
 LinkageInformationPresent=1
-Build=840
+Build=843
 UseEEPROMLocation0=1
 Chip=ATmega8A
 CPUClock=8000000
@@ -529,7 +529,7 @@ WarningStaticRamEepromStorageAllocConstStrLit=0
 WarningRegisterAddressXMEGA=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-COFFileTimeStamp=1253770357
+COFFileTimeStamp=1254850295
 [BuildInfoCompiler]
 L1=Build configuration: Debug
 L2=Chip: ATmega8A
@@ -547,8 +547,8 @@ L13=Enhanced function parameters passing: Yes
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 839
-L18=2479 line(s) compiled
+L17=Build: 842
+L18=2480 line(s) compiled
 L19=No errors
 L20=4 warning(s)
 L21=
@@ -567,18 +567,18 @@ L33=
 L34=Heap size: 0 byte(s)
 L35=
 L36=EEPROM usage: 0 byte(s), 0,0% of EEPROM
-L37=Program size: 2668 words (5336 bytes), 65,1% of FLASH
+L37=Program size: 2670 words (5340 bytes), 65,2% of FLASH
 Lines=37
 [BuildInfoAssembler]
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=C:\cvavr\Projects\IvanTime\Debug\List\IvanTime+Term.asm(5132): No EEPROM data, deleting C:\cvavr\Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
+L4=C:\cvavr\Projects\IvanTime\Debug\List\IvanTime+Term.asm(5135): No EEPROM data, deleting C:\cvavr\Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
 L5=
 L6=ATmega8A memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
 L8=---------------------------------------------------------------
-L9=[.cseg] 0x000000 0x0014d8   5220    116   5336    8192  65.1%
+L9=[.cseg] 0x000000 0x0014dc   5224    116   5340    8192  65.2%
 L10=[.dseg] 0x000060 0x0001b5      0     85     85    1024   8.3%
 L11=[.eseg] 0x000000 0x000000      0      0      0     512   0.0%
 L12=
@@ -715,10 +715,10 @@ BK8=-1
 BK9=-1
 [Bookmarks10]
 TimeStamp=1250473755
-Row=13
-Column=24
+Row=11
+Column=39
 ScrollPosX=0
-ScrollPosY=90
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -861,9 +861,27 @@ BK9=-1
 Blocks=0
 [FoldedCode7]
 Blocks=0
-[FoldedCode10]
+[Bookmarks18]
+TimeStamp=1253770356
+Row=2968
+Column=103
+ScrollPosX=0
+ScrollPosY=2946
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[FoldedCode18]
 Blocks=0
-[FoldedCode17]
+[FoldedCode9]
+Blocks=0
+[FoldedCode8]
 Blocks=0
 [HeadersList]
 Files=1
@@ -883,25 +901,7 @@ F10=1-wire.c
 F11=DS18Bxx.c
 [FoldedCode2]
 Blocks=0
-[Bookmarks18]
-TimeStamp=1253770356
-Row=2897
-Column=11
-ScrollPosX=0
-ScrollPosY=2876
-BK0=-1
-BK1=-1
-BK2=-1
-BK3=-1
-BK4=-1
-BK5=-1
-BK6=-1
-BK7=-1
-BK8=-1
-BK9=-1
-[FoldedCode18]
+[FoldedCode17]
 Blocks=0
-[FoldedCode9]
-Blocks=0
-[FoldedCode8]
+[FoldedCode10]
 Blocks=0

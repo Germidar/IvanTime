@@ -7,7 +7,7 @@
 #include <DS18Bxx.c>
 
 
-unsigned char Disp[9];      //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    ѕн    ¬т    —р    „т    ѕт    —б    Ќд    -    " "
+unsigned char Disp[9];       //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    ѕн    ¬т    —р    „т    ѕт    —б    Ќд    -    " "
 flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0xBF, 0x86, 0xDB, 0xCF, 0xE6, 0xED, 0xFD, 0x87, 0xFF, 0xEF, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x40, 0x00};     //ќголошенн€ масиву символ≥в в≥д 0 до 9 —C
 
 
@@ -511,6 +511,7 @@ if (button[2] > 0x7FFF)
 void main (void)
 {
 DDRB = 0b10101000;
+PORTB = 0b00010110;     // ¬нутр≥шн≥ PullUP резистори
 DDRC = 0x0F;
 DDRD = 0xFF; // Segments
 

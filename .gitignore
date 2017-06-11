@@ -21,6 +21,7 @@
 *.aws
 *.dmp
 *.i
+*.directory
 Debug/
 Exe/
 Linker/
