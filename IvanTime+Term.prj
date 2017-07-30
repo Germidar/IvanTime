@@ -142,7 +142,7 @@ WarningUnknownPragma=1
 LinkerWarnings=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-Build=866
+Build=875
 UseEEPROMLocation0=1
 IncludePath0=
 IncludePath1=
@@ -376,7 +376,7 @@ ScrollPosX=0
 ScrollPosY=33
 TimeStamp=1258142935
 [BookmarksFoldedCode]
-Files=18
+Files=19
 F1=D:\AVR\IvanTime\IvanTime+Term.c
 F2=IvanTime+Term.c
 F3=List\IvanTime+Term.asm
@@ -395,6 +395,7 @@ F15=D:\PRG\CVAVR\PR\IvanTime\fade_led.c
 F16=fade_led.c
 F17=timer_mode_manager.c
 F18=Debug\List\IvanTime+Term.asm
+F19=Debug\List\IvanTime+Term.map
 [Bookmarks1]
 TimeStamp=1176932802
 Row=13
@@ -432,7 +433,7 @@ BK9=-1
 [CompilerDebug]
 RebuildAll=0
 LinkageInformationPresent=1
-Build=866
+Build=875
 UseEEPROMLocation0=1
 Chip=ATmega8A
 CPUClock=8000000
@@ -529,7 +530,7 @@ WarningStaticRamEepromStorageAllocConstStrLit=0
 WarningRegisterAddressXMEGA=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-COFFileTimeStamp=1258189078
+COFFileTimeStamp=1258194260
 [BuildInfoCompiler]
 L1=Build configuration: Debug
 L2=Chip: ATmega8A
@@ -547,8 +548,8 @@ L13=Enhanced function parameters passing: Yes
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 866
-L18=2474 line(s) compiled
+L17=Build: 875
+L18=2505 line(s) compiled
 L19=No errors
 L20=3 warning(s)
 L21=
@@ -567,18 +568,18 @@ L33=
 L34=Heap size: 0 byte(s)
 L35=
 L36=EEPROM usage: 0 byte(s), 0,0% of EEPROM
-L37=Program size: 2692 words (5384 bytes), 65,7% of FLASH
+L37=Program size: 2848 words (5696 bytes), 69,5% of FLASH
 Lines=37
 [BuildInfoAssembler]
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=C:\cvavr\Projects\IvanTime\Debug\List\IvanTime+Term.asm(5151): No EEPROM data, deleting C:\cvavr\Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
+L4=C:\cvavr\Projects\IvanTime\Debug\List\IvanTime+Term.asm(5313): No EEPROM data, deleting C:\cvavr\Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
 L5=
 L6=ATmega8A memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
 L8=---------------------------------------------------------------
-L9=[.cseg] 0x000000 0x001508   5268    116   5384    8192  65.7%
+L9=[.cseg] 0x000000 0x001640   5580    116   5696    8192  69.5%
 L10=[.dseg] 0x000060 0x0001b7      0     87     87    1024   8.5%
 L11=[.eseg] 0x000000 0x000000      0      0      0     512   0.0%
 L12=
@@ -682,9 +683,9 @@ BK9=-1
 [FoldedCode5]
 Blocks=0
 [Bookmarks8]
-TimeStamp=1250689742
-Row=167
-Column=5
+TimeStamp=1254851800
+Row=0
+Column=0
 ScrollPosX=0
 ScrollPosY=0
 BK0=-1
@@ -698,9 +699,9 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks9]
-TimeStamp=1250538025
-Row=18
-Column=5
+TimeStamp=1254851800
+Row=0
+Column=0
 ScrollPosX=0
 ScrollPosY=0
 BK0=-1
@@ -843,8 +844,8 @@ BK9=-1
 Blocks=0
 [Bookmarks17]
 TimeStamp=1254851800
-Row=0
-Column=0
+Row=3
+Column=3
 ScrollPosX=0
 ScrollPosY=0
 BK0=-1
@@ -862,11 +863,11 @@ Blocks=0
 [FoldedCode7]
 Blocks=0
 [Bookmarks18]
-TimeStamp=1253770356
-Row=2968
-Column=103
+TimeStamp=1258189077
+Row=5104
+Column=10
 ScrollPosX=0
-ScrollPosY=2946
+ScrollPosY=4940
 BK0=-1
 BK1=-1
 BK2=-1
@@ -877,7 +878,9 @@ BK6=-1
 BK7=-1
 BK8=-1
 BK9=-1
-[FoldedCode18]
+[FoldedCode10]
+Blocks=0
+[FoldedCode2]
 Blocks=0
 [FoldedCode9]
 Blocks=0
@@ -885,9 +888,25 @@ Blocks=0
 Blocks=0
 [FoldedCode17]
 Blocks=0
-[FoldedCode10]
+[FoldedCode18]
 Blocks=0
-[FoldedCode2]
+[Bookmarks19]
+TimeStamp=1258189078
+Row=33
+Column=25
+ScrollPosX=0
+ScrollPosY=18
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[FoldedCode19]
 Blocks=0
 [HeadersList]
 Files=1

@@ -1,7 +1,6 @@
 #pragma used+
 void SysTime_incr (void);                                       // Підтримка роботи Системного часу
 
-
 unsigned char My_SREG = 0x01;                                   // Системний регістр налаштувань годинника.
 unsigned char System_time [3] = {0, 0, 0};                      // Годии, хвилини, секунди
 unsigned char System_date [5] = {0, 0, 0, 1, 20};               // Число, Місяць, Рік (десятки), День неділі, Рік (Сотні)

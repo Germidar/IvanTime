@@ -18,6 +18,8 @@ unsigned int button[3];
 unsigned char button_hold[3];
 unsigned int TEMP = 0x00;
 
+void save_settings_to_eeprom ();
+void load_settings_from_eeprom ();
 void reset_system (void)
 {
 #asm("rjmp 0") //test_program_reset
@@ -419,9 +421,9 @@ else
     {
 
     }
-if ((Display_System_Status < 0x03) & button[2] > 0x00 & button_hold[2] > 0x00)
+if ((Display_System_Status < 0x03) && button[2] > 0x00 & button_hold[2] > 0x00)
     {
-    if (button_hold[2] < 0x05)
+    if (button_hold[2] < 0x20)  // Час затримки для переходу у режим налаштувань годинника.
         {
         Display_System_Status = 0x02;
         }
@@ -502,17 +504,45 @@ if (button[2] > 0x7FFF)
     }
 }
 
+void load_settings_from_eeprom (void)
+{
+My_SREG = EEPROM_read(0x0010);
+cfg_pwm = EEPROM_read(0x0011);
+
+TEMP = EEPROM_read(0x0018);
+beep_permit = TEMP;
+TEMP = EEPROM_read(0x0019);
+beep_permit = (beep_permit << 8) + TEMP;
+EEPROM_read(0x001A);
+beep_permit = (beep_permit << 16) + TEMP;
+EEPROM_read(0x001B);
+beep_permit = (beep_permit << 24) + TEMP;
+TEMP = 0x00;
+}
+
+void save_settings_to_eeprom (void)
+{
+unsigned char dta = 0xFF;
+EEPROM_write(0x0010,My_SREG);
+EEPROM_write(0x0011,cfg_pwm);
+
+dta = beep_permit;
+EEPROM_write(0x001B,dta);
+dta = beep_permit >> 8;
+EEPROM_write(0x001A,dta);
+dta = beep_permit >> 16;
+EEPROM_write(0x0019,dta);
+dta = beep_permit >> 24;
+EEPROM_write(0x0018,dta);
+
+}
+
 void main (void)
 {
 DDRB = 0b10101000;
 PORTB = 0b00010110;     // Внутрішні PullUP резистори
 DDRC = 0x0F;
 DDRD = 0xFF; // Segments
-
-//#asm("cli")
-//EEPROM_write (0x0001, 0x12);
-//EEPROM_write (0x0002, 0x7A);
-//#asm("sei")
 
 // Timer/Counter 2 initialization
 ASSR=0<<AS2;
@@ -541,10 +571,12 @@ TCNT0=0xA2;
 // Global enable interrupts
 #asm("sei")
 
+load_settings_from_eeprom();    // Завантаження налаштуваннь пристрою з EEPROM
 TWI_MasterInit(100);
 Get_RTC_time();
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
 TIMSK=0x11; // був - 91 потом 11
+
 
 while(1)
     {
