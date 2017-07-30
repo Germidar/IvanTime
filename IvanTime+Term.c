@@ -14,7 +14,6 @@ flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 
 unsigned char Display_System_Status = 0x01;
 unsigned char xscr;
 unsigned char rt_sec = 10;
-unsigned char bttn = 0x00;
 unsigned int button[3];
 unsigned char button_hold[3];
 unsigned int TEMP = 0x00;
@@ -59,16 +58,6 @@ switch (Display_System_Status)
 
     Disp[8] = System_date[3] + 19; //Дні неділі
 
-    //--- debug mode begin
-//    Disp[9] = TEMP;    // space in debug first
-//    Disp[10] = System_date[0] / 10;         //Dat Dec
-//    Disp[11] = System_date[0] % 10 +10;     //Dat ED
-//    Disp[12] = System_date[1] / 10;         //Mounth Dec
-//    Disp[13] = System_date[1] % 10 +10;     //Mounth ED
-//    Disp[14] = System_date[2] / 10;         //Year Dec
-//    Disp[15] = System_date[2] % 10;         //Year ED
-    //--- debug mode end
-
     if (0x00 == System_time[2] % 0x02)      // Блимач
         {
         Disp[1] = Disp[1] + 0x0A;
@@ -98,7 +87,12 @@ switch (Display_System_Status)
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
     Disp[8] = 0x1C;
-
+    // Затримка для запобігання випадкового перемикання
+    if(TEMP == 0xFE)
+        {
+        delay_ms(800);
+        TEMP = 0x00;
+        }
     break;
 
     case 0x11:      // Редагування годин (0 - 23*)
@@ -317,8 +311,7 @@ switch (Display_System_Status)
 
     default:
     };
-#asm("cli") //test
-#asm("RCALL 6") //test
+Display_refr();
 }
 
 void push_button_L (void)
@@ -412,8 +405,7 @@ switch (Display_System_Status)
 
     default:
     };
-#asm("cli") //test
-#asm("RCALL 6") //test
+Display_refr();
 }
 
 void push_button_M (void)
@@ -436,6 +428,8 @@ if ((Display_System_Status < 0x03) & button[2] > 0x00 & button_hold[2] > 0x00)
     else
         {
         Display_System_Status = 0x10;
+        // Сигнал для режиму налаштуваннь
+        TEMP = 0xFE;
         }
     }
 else
@@ -454,123 +448,57 @@ else
         }
     }
 // TEST end
-#asm("cli") //test
-#asm("RCALL 6") //test
+Display_refr();
 }
 
-//void manager_push_button (void)
-//{
-//if (PINB.1 == 0x00) // Button "K" -
-//    {
-//    button[0]++;
-//    }
-//else
-//    {
-//    button[0] = 0x00;
-//    }
-//
-//if (PINB.2 == 0x00) // Button "L" +
-//    {
-//    button[1]++;
-//    }
-//else
-//    {
-//    button[1] = 0x00;
-//    }
-//
-//if (PINB.4 == 0x00) // Button "M" Mute/set/option
-//    {
-//    button[2]++;
-//    }
-//else
-//    {
-//    button[2] = 0x00;
-//    button_hold[2] = 0x00;
-//    if (Display_System_Status < 0x03)
-//        {
-//        Display_System_Status = 0x01;
-//        }
-//    }
-//
-//if (button[0] > 0x7FFF)     // Аппаратні затримки для усунення брязкоту контактів (зробити аппаратний захист.)
-//    {
-//    push_button_K();
-//    button[0] = 0x01;
-//    }
-//if (button[1] > 0x7FFF)
-//    {
-//    push_button_L();
-//    button[1] = 0x01;
-//    }
-//if (button[2] > 0x7FFF)
-//    {
-//    push_button_M();
-//    button[2] = 0x01;
-//    }
-//}
-
-void button_manager (void)  // Новий менеджер кнопок
+void manager_push_button (void)
 {
-bttn = (0x16 & PINB);   // Зчитування кнопок
-delay_ms(0x03);
-switch (bttn)
+if (PINB.1 == 0x00) // Button "K" -
     {
-    case 0x16:  // Жодної кнопки не натиснуто
-    bttn = (0x16 & PINB);
-    if (bttn == 0x16)
+    button[0]++;
+    }
+else
+    {
+    button[0] = 0x00;
+    }
+
+if (PINB.2 == 0x00) // Button "L" +
+    {
+    button[1]++;
+    }
+else
+    {
+    button[1] = 0x00;
+    }
+
+if (PINB.4 == 0x00) // Button "M" Mute/set/option
+    {
+    button[2]++;
+    }
+else
+    {
+    button[2] = 0x00;
+    button_hold[2] = 0x00;
+    if (Display_System_Status < 0x03)
         {
-
+        Display_System_Status = 0x01;
         }
-    break;
+    }
 
-    case 0x14:  // Натиснута кнопка K "-"
-    if (bttn == 0x14)
-        {
-        EEPROM_write(0x0000,'K');
-        }
-    break;
-
-    case 0x12:  // Натиснута кнопка L "+"
-    if (bttn == 0x12)
-        {
-        EEPROM_write(0x0000,'L');
-        }
-    break;
-
-    case 0x06:  // Натиснута кнопка M "Mute/set/option"
-    if (bttn == 0x06)
-        {
-        EEPROM_write(0x0000,'M');
-        }
-    break;
-
-    case 0x08:  // Натиснуті кнопки KL
-    if (bttn == 0x08)
-        {
-
-        }
-    break;
-
-    case 0x04:  // Натиснуті кнопки KM
-    if (bttn == 0x04)
-        {
-
-        }
-    break;
-
-    case 0x02:  // Натиснуті кнопки LM
-    if (bttn == 0x02)
-        {
-
-        }
-    break;
-
-    case 0x00:  // Натиснуті усі кнопки KLM
-    if (bttn == 0x00)
-        {
-
-        }
-    break;
+if (button[0] > 0x7FFF)     // Аппаратні затримки для усунення брязкоту контактів (зробити аппаратний захист.)
+    {
+    push_button_K();
+    button[0] = 0x01;
+    }
+if (button[1] > 0x7FFF)
+    {
+    push_button_L();
+    button[1] = 0x01;
+    }
+if (button[2] > 0x7FFF)
+    {
+    push_button_M();
+    button[2] = 0x01;
     }
 }
 
@@ -620,9 +548,8 @@ TIMSK=0x11; // був - 91 потом 11
 
 while(1)
     {
-    //manager_push_button();
-    button_manager();
-    if (rt_sec > 9)
+    manager_push_button();
+    if (Display_System_Status < 10 && rt_sec > 9)
         {
         Gov_No();
         rt_sec = 0x00;
