@@ -16,6 +16,9 @@ unsigned char xscr;
 unsigned char rt_sec = 10;
 unsigned int button[3];
 unsigned char button_hold[3];
+unsigned char refr_temp_dev = 0x0A;     // період оновлення датчиків температури
+unsigned char buttn_M_hold;             // час утримування кнопки M для переходу до режиму налажтуваннь
+unsigned char display_refresh = 0xFF;   // період оновлення дисплею
 unsigned int TEMP = 0x00;
 
 void save_settings_to_eeprom ();
@@ -506,8 +509,14 @@ if (button[2] > 0x7FFF)
 
 void load_settings_from_eeprom (void)
 {
-My_SREG = EEPROM_read(0x0010);
-cfg_pwm = EEPROM_read(0x0011);
+My_SREG =           EEPROM_read(0x0010);
+cfg_pwm =           EEPROM_read(0x0011);
+buttn_M_hold =      EEPROM_read(0x0012);
+refr_temp_dev =     EEPROM_read(0x0013);
+//var_1 =           EEPROM_read(0x0014);
+//var_2 =           EEPROM_read(0x0015);
+//abval =           EEPROM_read(0x0016);
+display_refresh =   EEPROM_read(0x0017);
 
 TEMP = EEPROM_read(0x0018);
 beep_permit = TEMP;
@@ -525,6 +534,12 @@ void save_settings_to_eeprom (void)
 unsigned char dta = 0xFF;
 EEPROM_write(0x0010,My_SREG);
 EEPROM_write(0x0011,cfg_pwm);
+EEPROM_write(0x0012,buttn_M_hold);
+EEPROM_write(0x0013,refr_temp_dev);
+//EEPROM_write(0x0014,var);
+//EEPROM_write(0x0015,var);
+//EEPROM_write(0x0016,abval);
+EEPROM_write(0x0017,display_refresh);
 
 dta = beep_permit;
 EEPROM_write(0x001B,dta);
@@ -581,7 +596,7 @@ TIMSK=0x11; // був - 91 потом 11
 while(1)
     {
     manager_push_button();
-    if (Display_System_Status < 10 && rt_sec > 9)
+    if (Display_System_Status < 10 && rt_sec > refr_temp_dev)
         {
         Gov_No();
         rt_sec = 0x00;
