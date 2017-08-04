@@ -50,11 +50,26 @@ void Display_refr (void)
 switch (Display_System_Status)
     {
     case 0x01:
+
     // Дисплей годинника
     Disp[3] = System_time[1] % 10;          // одиниці хвилин
     Disp[2] = System_time[1] / 10;          // десятки хвилин
     Disp[1] = System_time[0] % 10;          // одиниці годин
-    Disp[0] = System_time[0] / 10;          // десятки годин
+    if (My_SREG & 0x02)                     // Відкидання десятків годин, якщо меньше 10 годин.
+        {
+        Disp[0] = System_time[0] / 10;          // десятки годин
+        }
+    else
+        {
+        if (System_time[0] < 10)
+            {
+            Disp[0] = 28;
+            }
+        else
+            {
+            Disp[0] = System_time[0] / 10;
+            }
+        }
     // Дисплей темератури
     Disp[7] = Sys_Temp[3];                  // Дробова частина
     Disp[6] = Sys_Temp[2] + 10;             // Одиниці
@@ -185,7 +200,7 @@ rt_sec++;
 
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)  // Оновлення дисплею + Sound multipler
 {
-TCNT0=0xA2; // 0xA2 - 3,008 ms
+TCNT0=0xC1; // 0xC1 = 2 ms
 if (PORTC >=0x08)   //Standart 0x08; Debug 0x0F
     {
     PORTC = 0x00;
@@ -219,6 +234,7 @@ else
 
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)  // 1000 ms
 {
+//PORTB ^= 0b00100000;
 SysTime_incr();     // Функція ходу годинника
 Get_sys_temp();     // Інкремент для опитування датчиків температури
 Display_refr();     // Оновлення буферу даних для дисплею
@@ -560,10 +576,10 @@ DDRC = 0x0F;
 DDRD = 0xFF; // Segments
 
 // Timer/Counter 2 initialization
-ASSR=0<<AS2;
-TCCR2 = 0b11101010;
-TCNT2=0x00;
-OCR2=0xFF;       // Регістр порівняння
+//ASSR=0<<AS2;
+//TCCR2 = 0b11101010;
+//TCNT2=0x00;
+//OCR2=0xFF;       // Регістр порівняння
 
 // Timer/Counter 1 initialization
 TCCR1A=0x00;
@@ -577,16 +593,22 @@ OCR1AL=0x12;    //EEPROM_read (0x0001);  // 0x12
 OCR1BH=0x00;
 OCR1BL=0x00;
 
+//Timer/Counter 0 initialization
+//Clock source: System Clock
+//Clock value: 31,250 kHz
+TCCR0=(1<<CS02) | (0<<CS01) | (0<<CS00);
+TCNT0=0xFF;
+
 // Timer/Counter 0 initialization
 // Clock source: System Clock
-// Clock value: 31,250 kHz
-TCCR0=(1<<CS02) | (0<<CS01) | (0<<CS00);
-TCNT0=0xA2;
+// Clock value: 125,000 kHz
+//TCCR0=(0<<CS02) | (1<<CS01) | (1<<CS00);
+//TCNT0=0x06;
 
 // Global enable interrupts
 #asm("sei")
 
-load_settings_from_eeprom();    // Завантаження налаштуваннь пристрою з EEPROM
+//load_settings_from_eeprom();    // Завантаження налаштуваннь пристрою з EEPROM
 TWI_MasterInit(100);
 Get_RTC_time();
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення

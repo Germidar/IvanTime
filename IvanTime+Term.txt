@@ -14,11 +14,15 @@ flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 
 unsigned char Display_System_Status = 0x01;
 unsigned char xscr;
 unsigned char rt_sec = 10;
-unsigned char bttn = 0x00;
 unsigned int button[3];
 unsigned char button_hold[3];
+unsigned char refr_temp_dev = 0x0A;     // період оновлення датчиків температури
+unsigned char buttn_M_hold;             // час утримування кнопки M для переходу до режиму налажтуваннь
+unsigned char display_refresh = 0xFF;   // період оновлення дисплею
 unsigned int TEMP = 0x00;
 
+void save_settings_to_eeprom ();
+void load_settings_from_eeprom ();
 void reset_system (void)
 {
 #asm("rjmp 0") //test_program_reset
@@ -88,7 +92,12 @@ switch (Display_System_Status)
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
     Disp[8] = 0x1C;
-
+    // Затримка для запобігання випадкового перемикання
+    if(TEMP == 0xFE)
+        {
+        delay_ms(800);
+        TEMP = 0x00;
+        }
     break;
 
     case 0x11:      // Редагування годин (0 - 23*)
@@ -176,7 +185,7 @@ rt_sec++;
 
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)  // Оновлення дисплею + Sound multipler
 {
-TCNT0=0xA2; // 0xA2 - 3,008 ms
+TCNT0=0x83; // 0xA2 - 3,008 ms
 if (PORTC >=0x08)   //Standart 0x08; Debug 0x0F
     {
     PORTC = 0x00;
@@ -210,6 +219,7 @@ else
 
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)  // 1000 ms
 {
+//PORTB ^= 0b00100000;
 SysTime_incr();     // Функція ходу годинника
 Get_sys_temp();     // Інкремент для опитування датчиків температури
 Display_refr();     // Оновлення буферу даних для дисплею
@@ -307,6 +317,7 @@ switch (Display_System_Status)
 
     default:
     };
+Display_refr();
 }
 
 void push_button_L (void)
@@ -400,6 +411,7 @@ switch (Display_System_Status)
 
     default:
     };
+Display_refr();
 }
 
 void push_button_M (void)
@@ -415,13 +427,15 @@ else
     }
 if ((Display_System_Status < 0x03) && button[2] > 0x00 & button_hold[2] > 0x00)
     {
-    if (button_hold[2] < 0x05)
+    if (button_hold[2] < 0x20)  // Час затримки для переходу у режим налаштувань годинника.
         {
         Display_System_Status = 0x02;
         }
     else
         {
         Display_System_Status = 0x10;
+        // Сигнал для режиму налаштуваннь
+        TEMP = 0xFE;
         }
     }
 else
@@ -439,139 +453,104 @@ else
             }
         }
     }
-Display_refr();
 // TEST end
+Display_refr();
 }
 
-//void manager_push_button (void)
-//{
-//if (PINB.1 == 0x00) // Button "K" -
-//    {
-//    button[0]++;
-//    }
-//else
-//    {
-//    button[0] = 0x00;
-//    }
-//
-//if (PINB.2 == 0x00) // Button "L" +
-//    {
-//    button[1]++;
-//    }
-//else
-//    {
-//    button[1] = 0x00;
-//    }
-//
-//if (PINB.4 == 0x00) // Button "M" Mute/set/option
-//    {
-//    button[2]++;
-//    }
-//else
-//    {
-//    button[2] = 0x00;
-//    button_hold[2] = 0x00;
-//    if (Display_System_Status < 0x03)
-//        {
-//        Display_System_Status = 0x01;
-//        }
-//    }
-//
-//if (button[0] > 0x7FFF)     // Програмні затримки для усунення брязкоту контактів (зробити аппаратний захист.)
-//    {
-//    push_button_K();
-//    button[0] = 0x01;
-//    }
-//if (button[1] > 0x7FFF)
-//    {
-//    push_button_L();
-//    button[1] = 0x01;
-//    }
-//if (button[2] > 0x7FFF)
-//    {
-//    push_button_M();
-//    button[2] = 0x01;
-//    }
-//}
-
-void button_manager (void)  // Новий менеджер кнопок
+void manager_push_button (void)
 {
-bttn = (0x16 & PINB);   // Зчитування стану кнопок
-delay_ms(0x03);
-switch (bttn)
+if (PINB.1 == 0x00) // Button "K" -
     {
-    case 0x16:  // Жодної кнопки не натиснуто
-    bttn = (0x16 & PINB);
-    if (bttn == 0x16)
-        {
-        if (Display_System_Status < 3)
-            {
-            Display_System_Status = 0x01;
-            }
-        button_hold[0] = 0x00;
-        button_hold[1] = 0x00;
-        button_hold[2] = 0x00;
-        }
-    break;
-
-    case 0x14:  // Натиснута кнопка K "-"
-    if (bttn == 0x14)
-        {
-        push_button_K();
-        button_hold[0]++;
-        }
-    break;
-
-    case 0x12:  // Натиснута кнопка L "+"
-    if (bttn == 0x12)
-        {
-        push_button_L();
-        button_hold[1]++;
-        }
-    break;
-
-    case 0x06:  // Натиснута кнопка M "Mute/set/option"
-    if (bttn == 0x06)
-        {
-        push_button_M();
-        Display_System_Status = 0x02;
-        button_hold[2]++;
-        }
-    break;
-
-    case 0x08:  // Натиснуті кнопки KL
-    if (bttn == 0x08)
-        {
-
-        }
-    break;
-
-    case 0x04:  // Натиснуті кнопки KM
-    if (bttn == 0x04)
-        {
-
-        }
-    break;
-
-    case 0x02:  // Натиснуті кнопки LM
-    if (bttn == 0x02)
-        {
-
-        }
-    break;
-
-    case 0x00:  // Натиснуті усі кнопки KLM
-    if (bttn == 0x00)
-        {
-
-        }
-    break;
+    button[0]++;
+    }
+else
+    {
+    button[0] = 0x00;
     }
 
-if (button_hold[2] > 0xF0)
+if (PINB.2 == 0x00) // Button "L" +
     {
-    Display_System_Status = 0x10;
+    button[1]++;
     }
+else
+    {
+    button[1] = 0x00;
+    }
+
+if (PINB.4 == 0x00) // Button "M" Mute/set/option
+    {
+    button[2]++;
+    }
+else
+    {
+    button[2] = 0x00;
+    button_hold[2] = 0x00;
+    if (Display_System_Status < 0x03)
+        {
+        Display_System_Status = 0x01;
+        }
+    }
+
+if (button[0] > 0x7FFF)     // Аппаратні затримки для усунення брязкоту контактів (зробити аппаратний захист.)
+    {
+    push_button_K();
+    button[0] = 0x01;
+    }
+if (button[1] > 0x7FFF)
+    {
+    push_button_L();
+    button[1] = 0x01;
+    }
+if (button[2] > 0x7FFF)
+    {
+    push_button_M();
+    button[2] = 0x01;
+    }
+}
+
+void load_settings_from_eeprom (void)
+{
+My_SREG =           EEPROM_read(0x0010);
+cfg_pwm =           EEPROM_read(0x0011);
+buttn_M_hold =      EEPROM_read(0x0012);
+refr_temp_dev =     EEPROM_read(0x0013);
+//var_1 =           EEPROM_read(0x0014);
+//var_2 =           EEPROM_read(0x0015);
+//abval =           EEPROM_read(0x0016);
+display_refresh =   EEPROM_read(0x0017);
+
+TEMP = EEPROM_read(0x0018);
+beep_permit = TEMP;
+TEMP = EEPROM_read(0x0019);
+beep_permit = (beep_permit << 8) + TEMP;
+EEPROM_read(0x001A);
+beep_permit = (beep_permit << 16) + TEMP;
+EEPROM_read(0x001B);
+beep_permit = (beep_permit << 24) + TEMP;
+TEMP = 0x00;
+}
+
+void save_settings_to_eeprom (void)
+{
+unsigned char dta = 0xFF;
+EEPROM_write(0x0010,My_SREG);
+EEPROM_write(0x0011,cfg_pwm);
+EEPROM_write(0x0012,buttn_M_hold);
+EEPROM_write(0x0013,refr_temp_dev);
+//EEPROM_write(0x0014,var);
+//EEPROM_write(0x0015,var);
+//EEPROM_write(0x0016,abval);
+EEPROM_write(0x0017,display_refresh);
+
+dta = beep_permit;
+EEPROM_write(0x001B,dta);
+dta = beep_permit >> 8;
+EEPROM_write(0x001A,dta);
+dta = beep_permit >> 16;
+EEPROM_write(0x0019,dta);
+dta = beep_permit >> 24;
+EEPROM_write(0x0018,dta);
+
 }
 
 void main (void)
@@ -581,16 +560,11 @@ PORTB = 0b00010110;     // Внутрішні PullUP резистори
 DDRC = 0x0F;
 DDRD = 0xFF; // Segments
 
-//#asm("cli")
-//EEPROM_write (0x0001, 0x12);
-//EEPROM_write (0x0002, 0x7A);
-//#asm("sei")
-
 // Timer/Counter 2 initialization
-ASSR=0<<AS2;
-TCCR2 = 0b11101010;
-TCNT2=0x00;
-OCR2=0xFF;       // Регістр порівняння
+//ASSR=0<<AS2;
+//TCCR2 = 0b11101010;
+//TCNT2=0x00;
+//OCR2=0xFF;       // Регістр порівняння
 
 // Timer/Counter 1 initialization
 TCCR1A=0x00;
@@ -599,30 +573,37 @@ TCNT1H=0x00;
 TCNT1L=0x00;
 ICR1H=0x00;
 ICR1L=0x00;
-OCR1AH=0x7A;    //EEPROM_read (0x0002);  // 0x7A
-OCR1AL=0x12;    //EEPROM_read (0x0001);  // 0x12
+OCR1AH=0xF4;    //EEPROM_read (0x0002);  // 0x7A
+OCR1AL=0x24;    //EEPROM_read (0x0001);  // 0x12
 OCR1BH=0x00;
 OCR1BL=0x00;
 
 // Timer/Counter 0 initialization
 // Clock source: System Clock
 // Clock value: 31,250 kHz
+//TCCR0=(1<<CS02) | (0<<CS01) | (0<<CS00);
+//TCNT0=0xA2;
+
+// Timer/Counter 0 initialization
+// Clock source: System Clock
+// Clock value: 62,500 kHz
 TCCR0=(1<<CS02) | (0<<CS01) | (0<<CS00);
-TCNT0=0xA2;
+TCNT0=0x83;
 
 // Global enable interrupts
 #asm("sei")
 
+//load_settings_from_eeprom();    // Завантаження налаштуваннь пристрою з EEPROM
 TWI_MasterInit(100);
 Get_RTC_time();
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
 TIMSK=0x11; // був - 91 потом 11
 
+
 while(1)
     {
-    //manager_push_button();
-    button_manager();
-    if (rt_sec > 9)
+    manager_push_button();
+    if (Display_System_Status < 10 && rt_sec > refr_temp_dev)
         {
         Gov_No();
         rt_sec = 0x00;

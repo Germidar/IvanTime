@@ -38,7 +38,7 @@ else
 
 void beep_sound (unsigned int Time_in_ms, unsigned long frequency)
 {
-beep = Time_in_ms / 3.008;      // Визначення часу звучання біпера
+beep = Time_in_ms / 2;      // Визначення часу звучання біпера
 cfg_pwm &= 0xFE;                // bit0 = 0 "Sound_mode"
 TCCR2=(0<<PWM2) | (0<<COM21) | (1<<COM20) | (1<<CTC2) | (0<<CS22) | (1<<CS21) | (0<<CS20);
 OCR2 = (1000000 / (frequency * 2)) - 1;               //
