@@ -14,7 +14,9 @@ flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 
 unsigned char Display_System_Status = 0x01;
 unsigned char xscr;
 unsigned char rt_sec = 10;
-unsigned int button[3];
+unsigned char bttn; // Для нового алгоритму обробки кнопок
+unsigned char p_bttn = 0x00;            // Змінна натиснутих кнопок
+unsigned char button_pushed[3];
 unsigned char button_hold[3];
 unsigned char refr_temp_dev = 0x0A;     // період оновлення датчиків температури
 unsigned char buttn_M_hold;             // час утримування кнопки M для переходу до режиму налажтуваннь
@@ -443,96 +445,174 @@ Display_refr();
 
 void push_button_M (void)
 {
-// TEST begin
-if (PINB.4 == 0x00)
+if (Display_System_Status == 0x16)
     {
-    button_hold[2]++;
+    Set_RTC_time();
+    Display_System_Status = 0x01;
     }
 else
     {
+    Display_System_Status++;
+    }
 
-    }
-if ((Display_System_Status < 0x03) && button[2] > 0x00 & button_hold[2] > 0x00)
-    {
-    if (button_hold[2] < 0x10)  // Час затримки для переходу у режим налаштувань годинника.
-        {
-        Display_System_Status = 0x02;
-        }
-    else
-        {
-        Display_System_Status = 0x10;
-        beep_sound(1000,3800);
-        // Сигнал для режиму налаштуваннь
-        TEMP = 0xFE;
-        }
-    }
-else
-    {
-    if (Display_System_Status >= 0x10 & button[2] > 0x00)
-        {
-        if (Display_System_Status == 0x16)
-            {
-            Set_RTC_time();
-            Display_System_Status = 0x01;
-            }
-        else
-            {
-            Display_System_Status++;
-            }
-        }
-    }
-// TEST end
+//забрати звідси до менеджеру кнопок.
+//if ((Display_System_Status < 0x03) && button_pushed[2] > 0x00 & button_hold[2] > 0x00)
+//    {
+//    if (button_hold[2] < 0x10)  // Час затримки для переходу у режим налаштувань годинника.
+//        {
+//        Display_System_Status = 0x02;
+//        }
+//    else
+//        {
+//        Display_System_Status = 0x10;
+//        beep_sound(1000,3800);  // Сигнал для режиму налаштуваннь
+//        TEMP = 0xFE;
+//        }
+//    }
+
 Display_refr();
 }
 
-void manager_push_button (void)
+void button_manager (void)  // Новий менеджер кнопок
 {
-if (PINB.1 == 0x00) // Button "K" -
+bttn = (0x16 & PINB);       // Зчитування кнопок
+delay_ms(0x03);
+switch (bttn)
     {
-    button[0]++;
-    }
-else
-    {
-    button[0] = 0x00;
-    }
-
-if (PINB.2 == 0x00) // Button "L" +
-    {
-    button[1]++;
-    }
-else
-    {
-    button[1] = 0x00;
-    }
-
-if (PINB.4 == 0x00) // Button "M" Mute/set/option
-    {
-    button[2]++;
-    }
-else
-    {
-    button[2] = 0x00;
-    button_hold[2] = 0x00;
-    if (Display_System_Status < 0x03)
+    case 0x16:  // Жодної кнопки не натиснуто
+    bttn = (0x16 & PINB);
+    if (bttn == 0x16)
         {
-        Display_System_Status = 0x01;
+        p_bttn = 0x00;
+        button_pushed[0] = 0x00;
+        button_pushed[1] = 0x00;
+        button_pushed[2] = 0x00;
+        button_hold[0] = 0x00;
+        button_hold[1] = 0x00;
+        button_hold[2] = 0x00;
+        if (Display_System_Status < 0x10)
+            {
+            Display_System_Status = 0x01;
+            }
         }
-    }
+    break;
 
-if (button[0] > 0x7FFF)     // Аппаратні затримки для усунення брязкоту контактів (зробити аппаратний захист.)
-    {
-    push_button_K();
-    button[0] = 0x01;
-    }
-if (button[1] > 0x7FFF)
-    {
-    push_button_L();
-    button[1] = 0x01;
-    }
-if (button[2] > 0x7FFF)
-    {
-    push_button_M();
-    button[2] = 0x01;
+    case 0x14:  // Натиснута кнопка K "-"
+    if (bttn == 0x14)
+        {
+        if (p_bttn == 0x01) // Кнопка була натиснута
+            {
+            if (button_hold[0] > 0xD0)
+                {
+                button_pushed[0]++;
+                if (button_pushed[0] > 0x50)
+                    {
+                    push_button_K();
+                    button_pushed[0] = 0x00;
+                    }
+                }
+            else
+                {
+                button_hold[0]++;
+                }
+            }
+        else
+            {
+            push_button_K();    // Відпрацьювати натиснення кнопки
+            }
+        p_bttn = 0x01;          // запам’ятати подію натиснення кнопки
+        }
+    break;
+
+    case 0x12:  // Натиснута кнопка L "+"
+    if (bttn == 0x12)
+        {
+        if (p_bttn == 0x02)
+            {
+            if (button_hold[1] > 0xD0)
+                {
+                button_pushed[1]++;
+                if (button_pushed[1] > 0x50)
+                    {
+                    push_button_L();
+                    button_pushed[1] = 0x00;
+                    }
+                }
+            else
+                {
+                button_hold[1]++;
+                }
+            }
+        else
+            {
+            push_button_L();
+            }
+        p_bttn = 0x02;
+        }
+    break;
+
+    case 0x06:  // Натиснута кнопка M "Mute/set/option"
+    if (bttn == 0x06)
+        {
+        if (p_bttn == 0x04) // Кнопка була натиснута
+            {
+            if (button_hold[2] > 0xFE)  // час відображення дати/року
+                {
+                button_pushed[2]++;
+                if (button_pushed[2] > 0xE0)
+                    {
+                    push_button_M();
+                    button_pushed[2] = 0x00;
+                    }
+                }
+            else
+                {
+                button_hold[2]++;
+                }
+            }
+        else
+            {
+            if (Display_System_Status < 0x10)
+                {
+                Display_System_Status = 0x02;
+                Display_refr();
+                }
+            else
+                {
+                push_button_M();
+                }
+            }
+        p_bttn = 0x04;
+        }
+    break;
+
+    case 0x10:  // Натиснуті кнопки KL "-" "+"
+    if (bttn == 0x10)
+        {
+
+        }
+    break;
+
+    case 0x04:  // Натиснуті кнопки KM "-" "Mute/set/option"
+    if (bttn == 0x04)
+        {
+
+        }
+    break;
+
+    case 0x02:  // Натиснуті кнопки LM "+" "Mute/set/option"
+    if (bttn == 0x02)
+        {
+
+        }
+    break;
+
+    case 0x00:  // Натиснуті усі кнопки KLM "-" "+" "Mute/set/option"
+    if (bttn == 0x00)
+        {
+
+        }
+    break;
     }
 }
 
@@ -623,7 +703,8 @@ TIMSK=0x11; // був - 91 потом 11
 
 while(1)
     {
-    manager_push_button();
+    button_manager();
+
     if (Display_System_Status < 10 && rt_sec > refr_temp_dev)
         {
         Gov_No();
