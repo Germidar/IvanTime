@@ -21,6 +21,7 @@
 *.aws
 *.dmp
 *.i
+*.SDF
 *.directory
 Debug/
 Exe/

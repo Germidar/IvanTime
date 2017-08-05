@@ -1,5 +1,6 @@
 #pragma used+
-unsigned char cfg_pwm = 0x81;   // регістр конфігурації режиму таймера bit 0: =1 PWM | =0 SQW
+unsigned char cfg_pwm = 0x01;   // регістр конфігурації режиму таймера bit 0: =1 PWM | =0 SQW
+                                // bit 7: =1 auto_brightness ON | =0 auto_brightness 0FF
 unsigned char adctmp;
 unsigned int beep = 0x00; // 33 Час для звуку.
 void beep_sound (unsigned int Time_in_ms, unsigned long frequency);

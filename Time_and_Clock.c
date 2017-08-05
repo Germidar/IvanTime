@@ -2,6 +2,10 @@
 void SysTime_incr (void);                                       // Підтримка роботи Системного часу
 
 unsigned char My_SREG = 0x01;                                   // Системний регістр налаштувань годинника.
+                                                                // bit 0: =1 beep_per_hour ON       | =0 beep_per_hour OFF
+                                                                // bit 1: =1 hide_zerro_hour OFF    | =0 hide_zerro_hour ON
+                                                                // bit 2: =1 sound_buttons ON       | =0 sound_buttons OFF
+
 unsigned char System_time [3] = {0, 0, 0};                      // Годии, хвилини, секунди
 unsigned char System_date [5] = {0, 0, 0, 1, 20};               // Число, Місяць, Рік (десятки), День неділі, Рік (Сотні)
 unsigned char I2C_Buff[9];

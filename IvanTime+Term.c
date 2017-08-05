@@ -50,14 +50,13 @@ void Display_refr (void)
 switch (Display_System_Status)
     {
     case 0x01:
-
     // Дисплей годинника
     Disp[3] = System_time[1] % 10;          // одиниці хвилин
     Disp[2] = System_time[1] / 10;          // десятки хвилин
     Disp[1] = System_time[0] % 10;          // одиниці годин
     if (My_SREG & 0x02)                     // Відкидання десятків годин, якщо меньше 10 годин.
         {
-        Disp[0] = System_time[0] / 10;          // десятки годин
+        Disp[0] = System_time[0] / 10;      // десятки годин
         }
     else
         {
@@ -117,7 +116,21 @@ switch (Display_System_Status)
 
     case 0x11:      // Редагування годин (0 - 23*)
     Disp[1] = System_time[0] % 10;          // одиниці годин
-    Disp[0] = System_time[0] / 10;          // десятки годин
+    if (My_SREG & 0x02)                     // Відкидання десятків годин, якщо меньше 10 годин.
+        {
+        Disp[0] = System_time[0] / 10;      // десятки годин
+        }
+    else
+        {
+        if (System_time[0] < 10)
+            {
+            Disp[0] = 28;
+            }
+        else
+            {
+            Disp[0] = System_time[0] / 10;
+            }
+        }
     Disp[2] = 0x1C;
     Disp[3] = 0x1C;
     Disp[4] = 0x1C;
@@ -234,7 +247,6 @@ else
 
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)  // 1000 ms
 {
-//PORTB ^= 0b00100000;
 SysTime_incr();     // Функція ходу годинника
 Get_sys_temp();     // Інкремент для опитування датчиків температури
 Display_refr();     // Оновлення буферу даних для дисплею
@@ -442,13 +454,14 @@ else
     }
 if ((Display_System_Status < 0x03) && button[2] > 0x00 & button_hold[2] > 0x00)
     {
-    if (button_hold[2] < 0x20)  // Час затримки для переходу у режим налаштувань годинника.
+    if (button_hold[2] < 0x10)  // Час затримки для переходу у режим налаштувань годинника.
         {
         Display_System_Status = 0x02;
         }
     else
         {
         Display_System_Status = 0x10;
+        beep_sound(1000,3800);
         // Сигнал для режиму налаштуваннь
         TEMP = 0xFE;
         }
@@ -565,7 +578,6 @@ dta = beep_permit >> 16;
 EEPROM_write(0x0019,dta);
 dta = beep_permit >> 24;
 EEPROM_write(0x0018,dta);
-
 }
 
 void main (void)
@@ -575,11 +587,11 @@ PORTB = 0b00010110;     // Внутрішні PullUP резистори
 DDRC = 0x0F;
 DDRD = 0xFF; // Segments
 
-// Timer/Counter 2 initialization
-//ASSR=0<<AS2;
-//TCCR2 = 0b11101010;
-//TCNT2=0x00;
-//OCR2=0xFF;       // Регістр порівняння
+//Timer/Counter 2 initialization
+ASSR=0<<AS2;
+TCCR2 = 0b11101010;
+TCNT2=0x00;
+OCR2=0xFF;       // Регістр порівняння
 
 // Timer/Counter 1 initialization
 TCCR1A=0x00;
@@ -598,12 +610,6 @@ OCR1BL=0x00;
 //Clock value: 31,250 kHz
 TCCR0=(1<<CS02) | (0<<CS01) | (0<<CS00);
 TCNT0=0xFF;
-
-// Timer/Counter 0 initialization
-// Clock source: System Clock
-// Clock value: 125,000 kHz
-//TCCR0=(0<<CS02) | (1<<CS01) | (1<<CS00);
-//TCNT0=0x06;
 
 // Global enable interrupts
 #asm("sei")
