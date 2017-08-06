@@ -6,7 +6,7 @@ A=
 C=
 D=06.01.2015 18:07:35
 Files=1
-OpenedFiles=3
+OpenedFiles=5
 OutputListFilesDirectory=List
 OutputObjectFilesDirectory=Obj
 OutputExecutableFilesDirectory=Exe
@@ -21,7 +21,7 @@ PageIndex0=0
 OF1=IvanTime+Term.c
 Active1=1
 EditorPanel1=0
-TimeStamp1=1258619489
+TimeStamp1=1258690010
 PageIndex1=1
 ActiveTab=1
 ActiveBuildConfiguration=0
@@ -32,22 +32,22 @@ DebugOutputLinkerFilesDirectory=Debug\Link
 OF2=Time_and_Clock.c
 Active2=0
 EditorPanel2=0
-TimeStamp2=1258269101
+TimeStamp2=1258666005
 PageIndex2=2
 OF3=timer_mode_manager.c
 Active3=0
 EditorPanel3=0
-TimeStamp3=1258597892
+TimeStamp3=1258665399
 PageIndex3=3
-OF4=Debug\List\IvanTime+Term.asm
+OF4=DS18Bxx.c
 Active4=0
 EditorPanel4=0
-TimeStamp4=1253769474
+TimeStamp4=1254851800
 PageIndex4=4
-OF5=fade_led.c
+OF5=1-wire.c
 Active5=0
 EditorPanel5=0
-TimeStamp5=1248305316
+TimeStamp5=1254851800
 PageIndex5=5
 F1=IvanTime+Term.c
 [Compiler]
@@ -142,7 +142,7 @@ WarningUnknownPragma=1
 LinkerWarnings=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-Build=963
+Build=995
 UseEEPROMLocation0=1
 IncludePath0=
 IncludePath1=
@@ -370,11 +370,11 @@ UserProgCmdLine=
 UserProgWorkDir=
 WaitUserProgFinish=1
 [Bookmarks0]
-Row=612
+Row=633
 Column=1
 ScrollPosX=0
-ScrollPosY=580
-TimeStamp=1258621111
+ScrollPosY=601
+TimeStamp=1258690144
 [BookmarksFoldedCode]
 Files=19
 F1=D:\AVR\IvanTime\IvanTime+Term.c
@@ -415,11 +415,11 @@ BK9=-1
 [FoldedCode1]
 Blocks=0
 [Bookmarks2]
-TimeStamp=1258619489
-Row=231
-Column=0
+TimeStamp=1258690010
+Row=252
+Column=5
 ScrollPosX=0
-ScrollPosY=59
+ScrollPosY=674
 BK0=-1
 BK1=-1
 BK2=-1
@@ -433,7 +433,7 @@ BK9=-1
 [CompilerDebug]
 RebuildAll=0
 LinkageInformationPresent=1
-Build=963
+Build=995
 UseEEPROMLocation0=1
 Chip=ATmega8A
 CPUClock=8000000
@@ -530,7 +530,7 @@ WarningStaticRamEepromStorageAllocConstStrLit=0
 WarningRegisterAddressXMEGA=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-COFFileTimeStamp=1258688181
+COFFileTimeStamp=1258721347
 [BuildInfoCompiler]
 L1=Build configuration: Debug
 L2=Chip: ATmega8A
@@ -548,8 +548,8 @@ L13=Enhanced function parameters passing: Yes
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 963
-L18=2634 line(s) compiled
+L17=Build: 995
+L18=2644 line(s) compiled
 L19=No errors
 L20=5 warning(s)
 L21=
@@ -568,18 +568,18 @@ L33=
 L34=Heap size: 0 byte(s)
 L35=
 L36=EEPROM usage: 0 byte(s), 0,0% of EEPROM
-L37=Program size: 2645 words (5290 bytes), 64,6% of FLASH
+L37=Program size: 2699 words (5398 bytes), 65,9% of FLASH
 Lines=37
 [BuildInfoAssembler]
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=C:\cvavr\Projects\IvanTime\Debug\List\IvanTime+Term.asm(5266): No EEPROM data, deleting C:\cvavr\Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
+L4=C:\cvavr\Projects\IvanTime\Debug\List\IvanTime+Term.asm(5321): No EEPROM data, deleting C:\cvavr\Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
 L5=
 L6=ATmega8A memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
 L8=---------------------------------------------------------------
-L9=[.cseg] 0x000000 0x0014aa   5158    132   5290    8192  64.6%
+L9=[.cseg] 0x000000 0x001516   5266    132   5398    8192  65.9%
 L10=[.dseg] 0x000060 0x0001b9      0     89     89    1024   8.7%
 L11=[.eseg] 0x000000 0x000000      0      0      0     512   0.0%
 L12=
@@ -684,10 +684,10 @@ BK9=-1
 Blocks=0
 [Bookmarks8]
 TimeStamp=1254851800
-Row=162
-Column=4
+Row=167
+Column=5
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=161
 BK0=-1
 BK1=-1
 BK2=-1
@@ -715,11 +715,11 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks10]
-TimeStamp=1258269101
-Row=71
-Column=16
+TimeStamp=1258666005
+Row=5
+Column=29
 ScrollPosX=0
-ScrollPosY=12
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -843,11 +843,11 @@ BK9=-1
 [FoldedCode16]
 Blocks=0
 [Bookmarks17]
-TimeStamp=1258597892
-Row=16
-Column=5
+TimeStamp=1258665399
+Row=1
+Column=93
 ScrollPosX=0
-ScrollPosY=5
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -898,19 +898,19 @@ BK8=-1
 BK9=-1
 [FoldedCode19]
 Blocks=0
-[FoldedCode8]
-Blocks=0
+[FoldedCode2]
+Line1=33
+Line2=42
+Blocks=2
 [FoldedCode9]
 Blocks=0
-[FoldedCode2]
-Line1=48
-Line2=58
-Blocks=2
+[FoldedCode8]
+Blocks=0
 [FoldedCode17]
 Blocks=0
 [FoldedCode10]
-Line1=13
-Line2=43
+Line1=17
+Line2=47
 Blocks=2
 [HeadersList]
 Files=1

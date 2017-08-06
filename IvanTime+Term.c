@@ -445,38 +445,45 @@ Display_refr();
 
 void push_button_M (void)
 {
-if (Display_System_Status == 0x16)
+switch (Display_System_Status)
     {
+    case 0x01:
+    Display_System_Status = 0x02;
+    break;
+
+    case 0x02:
+    if (button_pushed[2] > 0xFE)
+        {
+        Display_System_Status = 0x10;
+        beep_sound(800,3800);  // Сигнал для режиму налаштуваннь
+        button_pushed[2] = 0x00;
+        button_hold[2] = 0x00;
+        buttn_M_hold = 0x00;
+        }
+    break;
+
+    case 0x16:
     Set_RTC_time();
     Display_System_Status = 0x01;
-    }
-else
-    {
-    Display_System_Status++;
-    }
+    break;
 
-//забрати звідси до менеджеру кнопок.
-//if ((Display_System_Status < 0x03) && button_pushed[2] > 0x00 & button_hold[2] > 0x00)
-//    {
-//    if (button_hold[2] < 0x10)  // Час затримки для переходу у режим налаштувань годинника.
-//        {
-//        Display_System_Status = 0x02;
-//        }
-//    else
-//        {
-//        Display_System_Status = 0x10;
-//        beep_sound(1000,3800);  // Сигнал для режиму налаштуваннь
-//        TEMP = 0xFE;
-//        }
-//    }
-
+    default:
+    if (Display_System_Status >= 0x10)
+        {
+        Display_System_Status++;
+        button_pushed[2] = 0x00;
+        button_hold[2] = 0x00;
+        buttn_M_hold = 0x00;
+        }
+    break;
+    }
 Display_refr();
 }
 
 void button_manager (void)  // Новий менеджер кнопок
 {
 bttn = (0x16 & PINB);       // Зчитування кнопок
-delay_ms(0x03);
+delay_ms(0x03);     // 3ms zbs з норм. кнопками.
 switch (bttn)
     {
     case 0x16:  // Жодної кнопки не натиснуто
@@ -490,10 +497,17 @@ switch (bttn)
         button_hold[0] = 0x00;
         button_hold[1] = 0x00;
         button_hold[2] = 0x00;
+        buttn_M_hold = 0x00;
+        if (Display_System_Status == 0x02)
+            {
+            Display_System_Status = 0x01;
+            Display_refr();
+            }
         if (Display_System_Status < 0x10)
             {
             Display_System_Status = 0x01;
             }
+
         }
     break;
 
@@ -505,7 +519,7 @@ switch (bttn)
             if (button_hold[0] > 0xD0)
                 {
                 button_pushed[0]++;
-                if (button_pushed[0] > 0x50)
+                if (button_pushed[0] > 0x40)
                     {
                     push_button_K();
                     button_pushed[0] = 0x00;
@@ -532,7 +546,7 @@ switch (bttn)
             if (button_hold[1] > 0xD0)
                 {
                 button_pushed[1]++;
-                if (button_pushed[1] > 0x50)
+                if (button_pushed[1] > 0x40)
                     {
                     push_button_L();
                     button_pushed[1] = 0x00;
@@ -554,15 +568,19 @@ switch (bttn)
     case 0x06:  // Натиснута кнопка M "Mute/set/option"
     if (bttn == 0x06)
         {
-        if (p_bttn == 0x04) // Кнопка була натиснута
+        if (p_bttn == 0x04) // Кнопка була натиснута раніше?
             {
             if (button_hold[2] > 0xFE)  // час відображення дати/року
                 {
-                button_pushed[2]++;
-                if (button_pushed[2] > 0xE0)
+                if (buttn_M_hold > 0x09)
                     {
+                    button_pushed[2]++;
                     push_button_M();
-                    button_pushed[2] = 0x00;
+                    }
+                else
+                    {
+                    buttn_M_hold++;
+                    button_hold[2] = 0x00;
                     }
                 }
             else
@@ -572,15 +590,7 @@ switch (bttn)
             }
         else
             {
-            if (Display_System_Status < 0x10)
-                {
-                Display_System_Status = 0x02;
-                Display_refr();
-                }
-            else
-                {
-                push_button_M();
-                }
+            push_button_M();
             }
         p_bttn = 0x04;
         }
