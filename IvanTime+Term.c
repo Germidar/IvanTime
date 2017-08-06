@@ -108,12 +108,6 @@ switch (Display_System_Status)
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
     Disp[8] = 0x1C;
-    // Затримка для запобігання випадкового перемикання
-    if(TEMP == 0xFE)
-        {
-        delay_ms(800);
-        TEMP = 0x00;
-        }
     break;
 
     case 0x11:      // Редагування годин (0 - 23*)
@@ -507,14 +501,13 @@ switch (bttn)
             {
             Display_System_Status = 0x01;
             }
-
         }
     break;
 
     case 0x14:  // Натиснута кнопка K "-"
     if (bttn == 0x14)
         {
-        if (p_bttn == 0x01) // Кнопка була натиснута
+        if (p_bttn == 0x01) // Кнопка була натиснута раніше?
             {
             if (button_hold[0] > 0xD0)
                 {
@@ -532,6 +525,10 @@ switch (bttn)
             }
         else
             {
+            if (My_SREG & 0x04)
+                {
+                beep_sound(10,3800);
+                }
             push_button_K();    // Відпрацьювати натиснення кнопки
             }
         p_bttn = 0x01;          // запам’ятати подію натиснення кнопки
@@ -559,6 +556,10 @@ switch (bttn)
             }
         else
             {
+            if (My_SREG & 0x04)
+                {
+                beep_sound(10,3800);
+                }
             push_button_L();
             }
         p_bttn = 0x02;
@@ -590,6 +591,10 @@ switch (bttn)
             }
         else
             {
+            if (My_SREG & 0x04)
+                {
+                beep_sound(10,3800);
+                }
             push_button_M();
             }
         p_bttn = 0x04;
