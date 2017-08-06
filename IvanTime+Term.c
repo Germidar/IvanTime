@@ -96,6 +96,8 @@ switch (Display_System_Status)
     Disp[6] = System_date[2] / 10;          //Year Dec
     Disp[5] = System_date[4] % 10;          //Year Sot
     Disp[4] = System_date[4] / 10;          //Year Tis
+    // ≤ндикатор дн€ тижн€
+    Disp[8] = System_date[3] + 19; //ƒн≥ нед≥л≥;
     break;
 
     case 0x10:      // –едагуванн€ хвилин (0 - 59)
@@ -107,7 +109,7 @@ switch (Display_System_Status)
     Disp[5] = 0x1C;
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
-    Disp[8] = 0x1C;
+    Disp[8] = 0x15;
     break;
 
     case 0x11:      // –едагуванн€ годин (0 - 23*)
@@ -133,7 +135,7 @@ switch (Display_System_Status)
     Disp[5] = 0x1C;
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
-    Disp[8] = 0x1C;
+    Disp[8] = 0x16;
     break;
 
     case 0x12:      // –едагуванн€ числа м≥с€ц€ (1 - 31*)
@@ -145,7 +147,7 @@ switch (Display_System_Status)
     Disp[5] = 0x1C;
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
-    Disp[8] = 0x1C;
+    Disp[8] = 0x17;
     break;
 
     case 0x13:      // –едагуванн€ номера м≥с€ц€ (1 - 12)
@@ -157,7 +159,7 @@ switch (Display_System_Status)
     Disp[5] = 0x1C;
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
-    Disp[8] = 0x1C;
+    Disp[8] = 0x18;
     break;
 
     case 0x14:      // –едагуванн€ дес€тк≥в року
@@ -169,7 +171,7 @@ switch (Display_System_Status)
     Disp[3] = 0x1C;
     Disp[4] = 0x1C;
     Disp[5] = 0x1C;
-    Disp[8] = 0x1C;
+    Disp[8] = 0x19;
 
     break;
 
@@ -182,7 +184,7 @@ switch (Display_System_Status)
     Disp[3] = 0x1C;
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
-    Disp[8] = 0x1C;
+    Disp[8] = 0x19;
     break;
 
     case 0x16:      // ¬становленн€ дн€ нед≥л≥
