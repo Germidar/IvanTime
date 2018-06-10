@@ -169,33 +169,20 @@ switch (Display_System_Status)
     Disp[9] = 0x1C;
     break;
 
-    case 0x14:      // Редагування десятків року
+    case 0x14:      // Редагування року
     Disp[7] = System_date[2] % 10;          //Year ED
     Disp[6] = System_date[2] / 10;          //Year Dec
-    Disp[0] = 0x1C;
-    Disp[1] = 0x1C;
-    Disp[2] = 0x1C;
-    Disp[3] = 0x1C;
-    Disp[4] = 0x1C;
-    Disp[5] = 0x1C;
-    Disp[8] = 0x19;
-    Disp[9] = 0x1C;
-    break;
-
-    case 0x15:      // Редагування сотень року
     Disp[5] = System_date[4] % 10;          //Year Sot
     Disp[4] = System_date[4] / 10;          //Year Tis
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
     Disp[2] = 0x1C;
     Disp[3] = 0x1C;
-    Disp[6] = 0x1C;
-    Disp[7] = 0x1C;
-    Disp[8] = 0x1A;
+    Disp[8] = 0x19;
     Disp[9] = 0x1C;
     break;
 
-    case 0x16:      // Встановлення дня неділі
+    case 0x15:      // Встановлення дня неділі
     Disp[8] = System_date[3] + 19; //Дні неділі
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
@@ -206,6 +193,10 @@ switch (Display_System_Status)
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
     Disp[9] = 0x1C;
+    break;
+
+    case 0x16:      //
+
     break;
 
     default:
@@ -319,10 +310,18 @@ switch (Display_System_Status)
         }
     break;
 
-    case 0x14:      // Редагування десятків року
+    case 0x14:      // Редагування року
     if (System_date[2] <= 0)
         {
         System_date[2] = 99;
+        if (System_date[4] <= 0)
+            {
+            System_date[4] = 99;
+            }
+        else
+            {
+            System_date[4]--;
+            }
         }
     else
         {
@@ -330,18 +329,7 @@ switch (Display_System_Status)
         }
     break;
 
-    case 0x15:      // Редагування сотень року
-    if (System_date[4] <= 0)
-        {
-        System_date[4] = 99;
-        }
-    else
-        {
-        System_date[4]--;
-        }
-    break;
-
-    case 0x16:      // Встановлення дня неділі
+    case 0x15:      // Встановлення дня неділі
     if (System_date[3] <= 1)
         {
         System_date[3] = 7;
@@ -350,6 +338,10 @@ switch (Display_System_Status)
         {
         System_date[3]--;
         }
+    break;
+
+    case 0x16:      //
+
     break;
 
     default:
@@ -416,10 +408,18 @@ switch (Display_System_Status)
         }
     break;
 
-    case 0x14:      // Редагування десятків року
+    case 0x14:      // Редагування року
     if (System_date[2] >= 99)
         {
         System_date[2] = 0;
+        if (System_date[4] >= 99)
+            {
+            System_date[4] = 0;
+            }
+        else
+            {
+            System_date[4]++;
+            }
         }
     else
         {
@@ -427,18 +427,7 @@ switch (Display_System_Status)
         }
     break;
 
-    case 0x15:      // Редагування сотень року
-    if (System_date[4] >= 99)
-        {
-        System_date[4] = 0;
-        }
-    else
-        {
-        System_date[4]++;
-        }
-    break;
-
-    case 0x16:      // Встановлення дня неділі
+    case 0x15:      // Встановлення дня неділі
     if (System_date[3] >= 7)
         {
         System_date[3] = 1;
@@ -447,6 +436,10 @@ switch (Display_System_Status)
         {
         System_date[3]++;
         }
+    break;
+
+    case 0x16:      //
+
     break;
 
     default:
@@ -474,17 +467,28 @@ switch (Display_System_Status)
     break;
 
     case 0x16:
-    Set_RTC_time();
-    Display_System_Status = 0x01;
+    Display_System_Status = 0x10;
     break;
 
     default:
     if (Display_System_Status >= 0x10)
         {
-        Display_System_Status++;
-        button_pushed[2] = 0x00;
-        button_hold[2] = 0x00;
-        buttn_M_hold = 0x00;
+        if (buttn_M_hold > 0x09)
+            {
+            beep_sound(800,3800);  // Сигнал виходу з режиму налаштуваннь
+            Set_RTC_time();
+            Display_System_Status = 0x01;
+            button_pushed[2] = 0x00;
+            button_hold[2] = 0x00;
+            buttn_M_hold = 0x00;
+            }
+        else
+            {
+            Display_System_Status++;
+            button_pushed[2] = 0x00;
+            button_hold[2] = 0x00;
+            buttn_M_hold = 0x00;
+            }
         }
     break;
     }
