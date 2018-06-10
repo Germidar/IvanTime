@@ -511,6 +511,8 @@ switch (bttn)
         {
         if (p_bttn == 0x01) // Кнопка була натиснута раніше?
             {
+            //delay_ms(500);                      // debug Fun
+            //Day_in_Mounth[0] = Search_ROM();    // debug Fun
             if (button_hold[0] > 0xD0)
                 {
                 button_pushed[0]++;

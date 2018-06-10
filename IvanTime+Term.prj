@@ -11,7 +11,7 @@ OutputListFilesDirectory=List
 OutputObjectFilesDirectory=Obj
 OutputExecutableFilesDirectory=Exe
 OutputLinkerFilesDirectory=Linker
-AllowDisplayFunctionCallTree=0
+AllowDisplayFunctionCallTree=1
 CleanUp=2
 EditorPanelMode=0
 ActiveEditorPanel=0
@@ -21,7 +21,7 @@ PageIndex0=0
 OF1=IvanTime+Term.c
 Active1=0
 EditorPanel1=0
-TimeStamp1=1282897415
+TimeStamp1=1287889616
 PageIndex1=1
 ActiveTab=1
 ActiveBuildConfiguration=0
@@ -30,9 +30,9 @@ DebugOutputObjectFilesDirectory=Debug
 DebugOutputExecutableFilesDirectory=Debug\Exe
 DebugOutputLinkerFilesDirectory=Debug\Link
 OF2=Time_and_Clock.c
-Active2=1
+Active2=0
 EditorPanel2=0
-TimeStamp2=1258723474
+TimeStamp2=1287717614
 PageIndex2=2
 OF3=timer_mode_manager.c
 Active3=0
@@ -40,9 +40,9 @@ EditorPanel3=0
 TimeStamp3=1258723474
 PageIndex3=3
 OF4=DS18Bxx.c
-Active4=0
+Active4=1
 EditorPanel4=0
-TimeStamp4=1258723474
+TimeStamp4=1287893724
 PageIndex4=4
 OF5=1-wire.c
 Active5=0
@@ -142,7 +142,7 @@ WarningUnknownPragma=1
 LinkerWarnings=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-Build=1014
+Build=1052
 UseEEPROMLocation0=1
 IncludePath0=
 IncludePath1=
@@ -374,7 +374,7 @@ Row=8
 Column=0
 ScrollPosX=0
 ScrollPosY=0
-TimeStamp=1287037097
+TimeStamp=1287895112
 [BookmarksFoldedCode]
 Files=20
 F1=D:\AVR\IvanTime\IvanTime+Term.c
@@ -416,11 +416,11 @@ BK9=-1
 [FoldedCode1]
 Blocks=0
 [Bookmarks2]
-TimeStamp=1282897415
-Row=0
-Column=0
+TimeStamp=1287889616
+Row=726
+Column=12
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=337
 BK0=-1
 BK1=-1
 BK2=-1
@@ -434,7 +434,7 @@ BK9=-1
 [CompilerDebug]
 RebuildAll=0
 LinkageInformationPresent=1
-Build=1014
+Build=1052
 UseEEPROMLocation0=1
 Chip=ATmega8A
 CPUClock=8000000
@@ -531,7 +531,7 @@ WarningStaticRamEepromStorageAllocConstStrLit=0
 WarningRegisterAddressXMEGA=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-COFFileTimeStamp=1287890380
+COFFileTimeStamp=1288017271
 [BuildInfoCompiler]
 L1=Build configuration: Debug
 L2=Chip: ATmega8A
@@ -549,8 +549,8 @@ L13=Enhanced function parameters passing: Yes
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 1014
-L18=2662 line(s) compiled
+L17=Build: 1052
+L18=2701 line(s) compiled
 L19=No errors
 L20=5 warning(s)
 L21=
@@ -560,11 +560,11 @@ L24=Data Stack area: 0x60 to 0x15F
 L25=Data Stack size: 256 byte(s)
 L26=Estimated Data Stack usage: 41 byte(s)
 L27=
-L28=RAM Global variables area: 0x160 to 0x1B8
-L29=RAM Global variables size: 89 byte(s)
+L28=RAM Global variables area: 0x160 to 0x1C7
+L29=RAM Global variables size: 104 byte(s)
 L30=
-L31=Hardware Stack area: 0x1B9 to 0x45F
-L32=Hardware Stack size: 679 byte(s)
+L31=Hardware Stack area: 0x1C8 to 0x45F
+L32=Hardware Stack size: 664 byte(s)
 L33=
 L34=Heap size: 0 byte(s)
 L35=
@@ -575,13 +575,13 @@ Lines=37
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=C:\Users\Germidar\MK_Projects\IvanTime\Debug\List\IvanTime+Term.asm(5372): No EEPROM data, deleting C:\Users\Germidar\MK_Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
+L4=C:\Users\Germidar\MK_Projects\IvanTime\Debug\List\IvanTime+Term.asm(5415): No EEPROM data, deleting C:\Users\Germidar\MK_Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
 L5=
 L6=ATmega8A memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
 L8=---------------------------------------------------------------
 L9=[.cseg] 0x000000 0x001566   5346    132   5478    8192  66.9%
-L10=[.dseg] 0x000060 0x0001b9      0     89     89    1024   8.7%
+L10=[.dseg] 0x000060 0x0001c8      0    104    104    1024  10.2%
 L11=[.eseg] 0x000000 0x000000      0      0      0     512   0.0%
 L12=
 Lines=12
@@ -684,11 +684,11 @@ BK9=-1
 [FoldedCode5]
 Blocks=0
 [Bookmarks8]
-TimeStamp=1258723474
-Row=0
-Column=0
+TimeStamp=1287893724
+Row=35
+Column=16
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=21
 BK0=-1
 BK1=-1
 BK2=-1
@@ -702,7 +702,7 @@ BK9=-1
 [Bookmarks9]
 TimeStamp=1258723474
 Row=0
-Column=0
+Column=41
 ScrollPosX=0
 ScrollPosY=0
 BK0=-1
@@ -716,11 +716,11 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks10]
-TimeStamp=1258723474
-Row=0
-Column=0
+TimeStamp=1287717614
+Row=98
+Column=76
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=57
 BK0=-1
 BK1=-1
 BK2=-1
@@ -895,22 +895,12 @@ BK6=-1
 BK7=-1
 BK8=-1
 BK9=-1
-[FoldedCode2]
-Blocks=0
-[FoldedCode9]
-Blocks=0
-[FoldedCode8]
-Blocks=0
-[FoldedCode17]
-Blocks=0
-[FoldedCode10]
-Blocks=0
 [Bookmarks20]
-TimeStamp=1287634713
-Row=10
-Column=121
+TimeStamp=1287954759
+Row=0
+Column=0
 ScrollPosX=0
-ScrollPosY=1720
+ScrollPosY=6144
 BK0=-1
 BK1=-1
 BK2=-1
@@ -924,6 +914,20 @@ BK9=-1
 [FoldedCode19]
 Blocks=0
 [FoldedCode18]
+Blocks=0
+[FoldedCode2]
+Line1=255
+Line2=349
+Line3=443
+Line4=480
+Blocks=4
+[FoldedCode9]
+Blocks=0
+[FoldedCode8]
+Blocks=0
+[FoldedCode17]
+Blocks=0
+[FoldedCode10]
 Blocks=0
 [FoldedCode20]
 Blocks=0

@@ -1,5 +1,5 @@
 #pragma used+
-unsigned char ROM [9];
+unsigned char ROM [3][8];
 signed int Sys_tmp;
 unsigned char Sys_Temp[4] = {28,28,18,28};
 float temperature;
@@ -18,36 +18,65 @@ void Recall_E ();
 unsigned char Read_Power_Supply (void);
 unsigned int Get_Temperature (unsigned char dev_numb);
 
+void clear_ROM (void)
+{
+unsigned char a, b, c;
+
+for (a = 0x00; a < 3; a++)
+    {
+    for (b = 0x00; b < 8; b++)
+        {
+        ROM[a][b] = 0x00;
+        }
+    }
+}
+
 unsigned char Search_ROM ()
 {
+unsigned char rBit, count_bit = 0x00, count_byte = 0x00, dualbit = 0x00;
 unsigned char dev_count = 0x00;
-unsigned char rBit, count_bit = 0x00, count_byte = 0x00;
+clear_ROM();
+newpoisk:
 if (W1_Reset())
     {
     W1_Tx(0xF0);
-    for (count_byte = 0x00; count_byte < 9; count_byte++)
+    for (count_byte = 0x00; count_byte < 8; count_byte++)
         {
         for (count_bit = 0x00; count_bit < 8; count_bit++)
             {
             rBit = W1_Rx(2);
+
             switch (rBit)
                 {
                 case 0x00:
-
+                dualbit = (count_byte * 8) + count_bit;
+                if (dev_count == 0x00)
+                    {
+                    ROM[dev_count][count_byte] |= 0x00 << count_bit;
+                    W1_Tx_bit(0x00);
+                    }
+                else
+                    {
+                    ROM[dev_count][count_byte] |= 0x01 << count_bit;
+                    W1_Tx_bit(0x01);
+                    }
                 break;
 
                 case 0x01:
-                ROM[count_byte] |= 0x01 << count_bit;
+                ROM[dev_count][count_byte] |= 0x01 << count_bit;
                 W1_Tx_bit(0x01);
                 break;
 
                 case 0x02:
-                ROM[count_byte] |= 0x00 << count_bit;
+                ROM[dev_count][count_byte] |= 0x00 << count_bit;
                 W1_Tx_bit(0x00);
                 break;
 
                 case 0x03:
-
+                // Помилка на шині (жодний пристрій не відповів)
+                dev_count = 0xFF;
+                count_byte = 0x00;
+                count_bit = 0x00;
                 break;
 
                 default:
@@ -55,12 +84,20 @@ if (W1_Reset())
                 }
             }
         }
+    if (dev_count != 0xFF)
+        {
+        dev_count++;
+        }
+
+    if ((dualbit > 0x00) & (dev_count == 0x01))
+        {
+        goto newpoisk;
+        }
     }
 else
     {
-
+    dev_count = 0x00;   // No Device
     }
-
 return dev_count;
 }
 
@@ -70,7 +107,7 @@ unsigned char x = 0x00;
 W1_Tx(0x33);
 while(x<8)
     {
-    ROM[x] = W1_Rx(8);
+    ROM[2][x] = W1_Rx(8);   // temp in debug
     x++;
     }
 }
@@ -81,7 +118,7 @@ unsigned char x = 0x00;
 W1_Tx(0x55);
 while(x<8)
     {
-    W1_Tx(ROM[x]);
+    W1_Tx(ROM[ROM_number][x]);
     x++;
     }
 }
