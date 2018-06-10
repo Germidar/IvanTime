@@ -1,8 +1,10 @@
 #pragma used+
-unsigned char ROM [3][8];
-signed int Sys_tmp;
-unsigned char Sys_Temp[4] = {28,28,18,28};
-float temperature;
+unsigned char ROM [3][8];   //  Address find device
+unsigned char Sys_Temp[3][4] = {{28,28,18,28},
+                                {28,28,18,28},
+                                {28,28,18,28}};
+
+unsigned char dev_count;
 
 unsigned char Search_ROM ();
 void Read_ROM (void);
@@ -10,17 +12,41 @@ void Match_ROM (unsigned ROM_number);
 void Skip_ROM (void);
 void Alarm_Search ();
 void Convert_T (void);
-signed int Pidarastiya (void);
 void Write_Scratchpad ();
 void Read_Scratchpad ();
 void Copy_Scratchpad ();
 void Recall_E ();
+
+void Convert_Temperature();
+void Update_Temperature_data();
 unsigned char Read_Power_Supply (void);
-unsigned int Get_Temperature (unsigned char dev_numb);
+signed int Get_temperature (unsigned char index_device);
+
+unsigned char calc_crc (unsigned char *mas)
+{
+unsigned char i,data,crc,fb,st_byt;
+st_byt = 0x00;
+crc = 0x00;
+do
+    {
+    data = mas[st_byt];
+    for (i=0;i<8;i++)           // счетчик битов в байте
+        {
+        fb =crc  ^ data;
+        fb&=1;
+        crc >>= 1;
+        data >>= 1;
+        if (fb == 1)crc^=0x8c;  // полином, мля
+        }
+    st_byt++;
+    }
+while (st_byt != 9);            // счетчик байтов в массиве
+return crc;
+}
 
 void clear_ROM (void)
 {
-unsigned char a, b, c;
+unsigned char a, b;
 
 for (a = 0x00; a < 3; a++)
     {
@@ -34,7 +60,7 @@ for (a = 0x00; a < 3; a++)
 unsigned char Search_ROM ()
 {
 unsigned char rBit, count_bit = 0x00, count_byte = 0x00, dualbit = 0x00;
-unsigned char dev_count = 0x00;
+dev_count = 0x00;
 clear_ROM();
 newpoisk:
 if (W1_Reset())
@@ -114,13 +140,12 @@ while(x<8)
 
 void Match_ROM (unsigned ROM_number)                // Звернення до конктретного пристрою на шині
 {
-unsigned char x = 0x00;
+unsigned char rom_byte;
 W1_Tx(0x55);
-while(x<8)
-    {
-    W1_Tx(ROM[ROM_number][x]);
-    x++;
-    }
+for (rom_byte=0x00; rom_byte < 8; rom_byte++)
+	{
+	W1_Tx(ROM[ROM_number][rom_byte]);
+	}
 }
 
 void Skip_ROM (void)                                // Пропустити ROM-код звернення до всіх датчиків що присутні на шині
@@ -130,29 +155,14 @@ W1_Tx(0xCC);
 
 void Alarm_Search ()
 {
+//int *p;
+W1_Tx(0xEC);
 
 }
 
 void Convert_T (void)
 {
 W1_Tx(0x44);
-}
-
-signed int Pidarastiya (void)                // Зчитування 9 бітів EEPROM DS18B20+
-{
-unsigned char scrp [9];
-unsigned char x = 0x00;
-signed int z;
-W1_Tx(0xBE);
-while(x<8)
-    {
-    scrp[x] = W1_Rx(8);
-    x++;
-    }
-z = scrp[1] << 8;
-z |= 0x00FF & scrp[0];
-
-return z;
 }
 
 void Write_Scratchpad ()
@@ -183,63 +193,106 @@ x = W1_Rx(0x01);
 return x;
 }
 
-unsigned int Get_Temperature (unsigned char dev_numb)
+signed int Get_temperature (unsigned char index_device)
 {
-unsigned int tC;
-if (W1_Reset() == 0x01)
-    {
-    Skip_ROM();
-    Convert_T();
-    delay_ms(810);
-    W1_Reset();
-    Skip_ROM();
-    tC = Pidarastiya();
-    }
-else
-    {
+signed int temperature;
+unsigned char scrp [9];
+unsigned char scrp_num = 0x00;
+unsigned char chekbyte = 0x00;
 
+while(scrp_num < 9)
+    {
+    scrp[scrp_num] = W1_Rx(8);
+    scrp_num++;
     }
-return tC;
+temperature = scrp[1] << 8;
+temperature |= 0x00FF & scrp[0];
+
+chekbyte = calc_crc(scrp);
+if (chekbyte)
+    {
+    temperature = -32768;
+    }
+return temperature;
 }
 
-void Gov_No (void)
+void Convert_Temperature(void)
 {
-signed int i_tmp;
-Sys_tmp = Get_Temperature(1);
-i_tmp = Sys_tmp >> 4;
-temperature = i_tmp + (Sys_tmp & 0x000F) * 0.0625;
+if (W1_Reset())
+	{
+	Skip_ROM();		// W1_Tx(0xCC);
+	Convert_T();	// W1_Tx(0x44);
+	}
+}
 
-if (temperature < 0)
+void Update_Temperature_data(void)
+{
+unsigned char dev_num;                                  // dev_count - Кількість знайдених пристроїв
+signed int vremtemp;
+unsigned char T_integer, T_fraction;
+unsigned char znak = 0x1C;
+
+for (dev_num = 0x00; dev_num < dev_count; dev_num++)
     {
-    Sys_tmp ^= 0xFFFF;
-    Sys_tmp++;
-    i_tmp = Sys_tmp >> 4;
-    temperature = i_tmp + (Sys_tmp & 0x000F) * 0.0625;
-    Sys_Temp[0] = 27;
-    goto plus;
-    }
-else
-    {
-    if (i_tmp > 99)
+    if (W1_Reset())
         {
-        Sys_Temp[0] = i_tmp / 100;
-        Sys_Temp[1] = (i_tmp - 100) / 10;
-        Sys_Temp[2] = (i_tmp - 100) % 10;
+        Match_ROM(dev_num);                             // W1_Tx(0x55);
+		Read_Scratchpad(); 		                        // W1_Tx(0xBE);
+		vremtemp = Get_temperature(dev_num);	        // Зчитуємо 9 байтів з датчика та перевіряємо СRC
+        if (vremtemp == -32768)
+            {
+
+            }
+        else
+            {
+            if(vremtemp < 0)
+                {
+                vremtemp = (vremtemp ^= 0xFFFF);
+                vremtemp++;
+                znak = 0x1B;
+                }
+            else
+                {
+                znak = 0x1C;
+                }
+
+            T_integer = vremtemp >> 4;
+            T_fraction = 0x000F & vremtemp;
+
+            if (T_integer > 99)
+                {
+                Sys_Temp[dev_num][0] = T_integer / 100;
+                Sys_Temp[dev_num][1] = (T_integer - 100) / 10;
+                Sys_Temp[dev_num][2] = (T_integer - 100) % 10;
+                }
+            else
+                {
+                if (T_integer > 9)
+                    {
+                    Sys_Temp[dev_num][0] = znak;
+                    Sys_Temp[dev_num][1] = T_integer / 10;
+                    Sys_Temp[dev_num][2] = T_integer % 10;
+                    }
+                else
+                    {
+                    Sys_Temp[dev_num][0] = 0x1C;
+                    Sys_Temp[dev_num][1] = znak;
+                    Sys_Temp[dev_num][2] = T_integer;
+                    }
+                }
+            Sys_Temp[dev_num][3] = (T_fraction * 0.625);    // Десяткова частина температури
+            }
         }
     else
         {
-        Sys_Temp[0] = 28;
-        plus:
-        Sys_Temp[1] = i_tmp / 10;
-        if (Sys_Temp[1] < 1)
-            {
-            Sys_Temp[1] = Sys_Temp[0];
-            Sys_Temp[0] = 28;
-            }
-        Sys_Temp[2] = i_tmp % 10;
+        Sys_Temp[dev_num][0] = 0x1C;
+        Sys_Temp[dev_num][1] = 0x1C;
+        Sys_Temp[dev_num][2] = 0x12;
+        Sys_Temp[dev_num][3] = 0x1C;
         }
-    Sys_Temp[3] = (temperature - i_tmp) * 10;
+
     }
+
 }
 
 #pragma used-

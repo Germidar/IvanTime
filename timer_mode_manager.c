@@ -1,8 +1,9 @@
 #pragma used+
-unsigned char cfg_pwm = 0x01;   // регістр конфігурації режиму таймера bit 0: =1 PWM | =0 SQW
+unsigned char cfg_pwm = 0x81;   // регістр конфігурації режиму таймера
+                                // bit 0: =1 PWM | =0 SQW
                                 // bit 7: =1 auto_brightness ON | =0 auto_brightness 0FF
 unsigned char adctmp;
-unsigned int beep = 0x00; // 33 Час для звуку.
+unsigned int beep = 0x00;       // 33 Час для звуку.
 void beep_sound (unsigned int Time_in_ms, unsigned long frequency);
 
 void set_brightness (unsigned char brightness)
@@ -17,7 +18,7 @@ if (cfg_pwm & 0x01)
 
 void auto_brightness (void)
 {
-if (cfg_pwm & 0x80)
+if (cfg_pwm & 0x80)     // Перевірка на дозвіл зміни яскравості дисплея
     {
     ADMUX = 0b00100111;
     ADCSRA = 0b10100101;
@@ -40,7 +41,7 @@ else
 void beep_sound (unsigned int Time_in_ms, unsigned long frequency)
 {
 beep = Time_in_ms / 2;      // Визначення часу звучання біпера
-cfg_pwm &= 0xFE;                // bit0 = 0 "Sound_mode"
+cfg_pwm &= 0xFE;            // cfg_pwm bit0 = 0 "Sound_mode"
 TCCR2=(0<<PWM2) | (0<<COM21) | (1<<COM20) | (1<<CTC2) | (0<<CS22) | (1<<CS21) | (0<<CS20);
 OCR2 = (1000000 / (frequency * 2)) - 1;               //
 PORTB.5 = 0x00;

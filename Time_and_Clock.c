@@ -1,7 +1,7 @@
 #pragma used+
 void SysTime_incr (void);                                       // Підтримка роботи Системного часу
 
-unsigned char My_SREG = 0x05;                                   // Системний регістр налаштувань годинника.
+unsigned char My_SREG = 0b00000101;                             // Системний регістр налаштувань годинника.
                                                                 // bit 0: =1 beep_per_hour ON       | =0 beep_per_hour OFF
                                                                 // bit 1: =1 hide_zerro_hour OFF    | =0 hide_zerro_hour ON
                                                                 // bit 2: =1 sound_buttons ON       | =0 sound_buttons OFF

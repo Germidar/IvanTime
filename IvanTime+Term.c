@@ -7,20 +7,22 @@
 #include <DS18Bxx.c>
 
 
-unsigned char Disp[9];       //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    Пн    Вт    Ср    Чт    Пт    Сб    Нд    -    " "
+unsigned char Disp[10];       //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    Пн    Вт    Ср    Чт    Пт    Сб    Нд    -    " "
 flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0xBF, 0x86, 0xDB, 0xCF, 0xE6, 0xED, 0xFD, 0x87, 0xFF, 0xEF, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x40, 0x00};     //Оголошення масиву символів від 0 до 9 СC
 
 
 unsigned char Display_System_Status = 0x01;
 unsigned char xscr;
-unsigned char rt_sec = 10;
 unsigned char bttn;                     // Для нового алгоритму обробки кнопок
 unsigned char p_bttn = 0x00;            // Змінна натиснутих кнопок
 unsigned char button_pushed[3];
 unsigned char button_hold[3];
-unsigned char refr_temp_dev = 0x0A;     // період оновлення датчиків температури
+unsigned char rt_sec = 0x08;            // Час піся останнього оновлення температури
+unsigned char refr_temp_dev = 0x09;     // період оновлення датчиків температури
 unsigned char buttn_M_hold;             // час утримування кнопки M для переходу до режиму налажтуваннь
 unsigned char display_refresh = 0xFF;   // період оновлення дисплею
+unsigned char curr_dev = 0x00;          // Номер датчика температури для відображення
+unsigned char conv_need = 0xFF;         // Прапорець необхідності виконання конвертації температури датчиками
 unsigned int  TEMP = 0x00;
 
 void save_settings_to_eeprom ();
@@ -72,13 +74,13 @@ switch (Display_System_Status)
             }
         }
     // Дисплей темератури
-    Disp[7] = Sys_Temp[3];                  // Дробова частина
-    Disp[6] = Sys_Temp[2] + 10;             // Одиниці
-    Disp[5] = Sys_Temp[1];                  // Десятки
-    Disp[4] = Sys_Temp[0];                  // Сотні
+    Disp[7] = Sys_Temp[curr_dev][3];                  // Дробова частина
+    Disp[6] = Sys_Temp[curr_dev][2] + 10;             // Одиниці
+    Disp[5] = Sys_Temp[curr_dev][1];                  // Десятки
+    Disp[4] = Sys_Temp[curr_dev][0];                  // Сотні
 
-    Disp[8] = System_date[3] + 19; //Дні неділі
-
+    Disp[8] = System_date[3] + 19;  // Дні неділі
+    Disp[9] = 21 + curr_dev;        // Номер датчика для відображення
     if (0x00 == System_time[2] % 0x02)      // Блимач
         {
         Disp[1] = Disp[1] + 0x0A;
@@ -98,6 +100,7 @@ switch (Display_System_Status)
     Disp[4] = System_date[4] / 10;          //Year Tis
     // Індикатор дня тижня
     Disp[8] = System_date[3] + 19; //Дні неділі;
+    Disp[9] = 0x1C;
     break;
 
     case 0x10:      // Редагування хвилин (0 - 59)
@@ -110,6 +113,7 @@ switch (Display_System_Status)
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
     Disp[8] = 0x15;
+    Disp[9] = 0x1C;
     break;
 
     case 0x11:      // Редагування годин (0 - 23*)
@@ -136,6 +140,7 @@ switch (Display_System_Status)
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
     Disp[8] = 0x16;
+    Disp[9] = 0x1C;
     break;
 
     case 0x12:      // Редагування числа місяця (1 - 31*)
@@ -148,6 +153,7 @@ switch (Display_System_Status)
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
     Disp[8] = 0x17;
+    Disp[9] = 0x1C;
     break;
 
     case 0x13:      // Редагування номера місяця (1 - 12)
@@ -160,6 +166,7 @@ switch (Display_System_Status)
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
     Disp[8] = 0x18;
+    Disp[9] = 0x1C;
     break;
 
     case 0x14:      // Редагування десятків року
@@ -172,7 +179,7 @@ switch (Display_System_Status)
     Disp[4] = 0x1C;
     Disp[5] = 0x1C;
     Disp[8] = 0x19;
-
+    Disp[9] = 0x1C;
     break;
 
     case 0x15:      // Редагування сотень року
@@ -184,7 +191,8 @@ switch (Display_System_Status)
     Disp[3] = 0x1C;
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
-    Disp[8] = 0x19;
+    Disp[8] = 0x1A;
+    Disp[9] = 0x1C;
     break;
 
     case 0x16:      // Встановлення дня неділі
@@ -197,14 +205,15 @@ switch (Display_System_Status)
     Disp[5] = 0x1C;
     Disp[6] = 0x1C;
     Disp[7] = 0x1C;
+    Disp[9] = 0x1C;
     break;
 
     default:
     };
-//auto_brightness(); //debug_PWM
+auto_brightness(); //debug_PWM
 }
 
-void Get_sys_temp (void)
+void SysTemp_incr (void)
 {
 rt_sec++;
 }
@@ -212,7 +221,7 @@ rt_sec++;
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)  // Оновлення дисплею + Sound multipler
 {
 TCNT0=0xC1; // 0xC1 = 2 ms
-if (PORTC >=0x08)   //Standart 0x08; Debug 0x0F
+if (PORTC >=0x09)   //Standart 0x08; 0х09 - device identifer; Debug 0x0F
     {
     PORTC = 0x00;
     xscr = 0x00;
@@ -246,7 +255,7 @@ else
 interrupt [TIM1_COMPA] void timer1_compa_isr(void)  // 1000 ms
 {
 SysTime_incr();     // Функція ходу годинника
-Get_sys_temp();     // Інкремент для опитування датчиків температури
+SysTemp_incr();     // Інкремент для опитування датчиків температури
 Display_refr();     // Оновлення буферу даних для дисплею
 
 }
@@ -256,7 +265,10 @@ void push_button_K (void)
 switch (Display_System_Status)
     {
     case 0x01:
-
+    if (curr_dev > 0x00)
+        {
+        curr_dev--;
+        }
     break;
 
     case 0x02:      // Відображення Числа місяця та року на дислпеї
@@ -350,7 +362,10 @@ void push_button_L (void)
 switch (Display_System_Status)
     {
     case 0x01:
-
+    if (curr_dev < 0x01) // dev_count
+        {
+        curr_dev++;
+        }
     break;
 
     case 0x02:      // Відображення Числа місяця та року на дислпеї
@@ -511,8 +526,6 @@ switch (bttn)
         {
         if (p_bttn == 0x01) // Кнопка була натиснута раніше?
             {
-            //delay_ms(500);                      // debug Fun
-            //Day_in_Mounth[0] = Search_ROM();    // debug Fun
             if (button_hold[0] > 0xD0)
                 {
                 button_pushed[0]++;
@@ -717,6 +730,7 @@ TCNT0=0xFF;
 TWI_MasterInit(100);
 Get_RTC_time();
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
+dev_count = Search_ROM();
 TIMSK=0x11; // був - 91 потом 11
 
 
@@ -724,11 +738,24 @@ while(1)
     {
     button_manager();
 
-    if (Display_System_Status < 10 && rt_sec > refr_temp_dev)
+    if (Display_System_Status < 10)
         {
-        Gov_No();
-        rt_sec = 0x00;
-        }
+        if (rt_sec > refr_temp_dev)
+        	{
+            Update_Temperature_data();  // Оновити температуру данними з пристроїв
+            rt_sec = 0x00;		        // chiki-piki need 0x01
+            conv_need = 0xFF;
+        	Display_refr();
+            }
+        else
+        	{
+        	if (rt_sec >= refr_temp_dev && conv_need)   // + прапорець запуску конвертування температури.
+                {
+        		Convert_Temperature();                  // Convert T
+                conv_need = 0x00;
+        		}
+        	}
+		}
 
     }
 }
