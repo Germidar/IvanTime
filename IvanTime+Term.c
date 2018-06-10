@@ -14,14 +14,14 @@ flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 
 unsigned char Display_System_Status = 0x01;
 unsigned char xscr;
 unsigned char rt_sec = 10;
-unsigned char bttn; // Для нового алгоритму обробки кнопок
+unsigned char bttn;                     // Для нового алгоритму обробки кнопок
 unsigned char p_bttn = 0x00;            // Змінна натиснутих кнопок
 unsigned char button_pushed[3];
 unsigned char button_hold[3];
 unsigned char refr_temp_dev = 0x0A;     // період оновлення датчиків температури
 unsigned char buttn_M_hold;             // час утримування кнопки M для переходу до режиму налажтуваннь
 unsigned char display_refresh = 0xFF;   // період оновлення дисплею
-unsigned int TEMP = 0x00;
+unsigned int  TEMP = 0x00;
 
 void save_settings_to_eeprom ();
 void load_settings_from_eeprom ();

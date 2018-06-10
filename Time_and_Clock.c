@@ -87,16 +87,27 @@ if (System_time[2] > 58)                        // Секунди
                 {
                 System_date[3]++;
                 }
-            if (System_date[0] >= Day_in_Mounth[System_date[1]])            // Доба
+
+            if (System_date[0] >= Day_in_Mounth[System_date[1]])            // Доба (День місяця/Дата)
                 {
                 System_date[0] = 0x01;
-                if(System_date[2] > 98)         // Рік
+
+                if(System_date[1] > 11)                                     // Місяць
                     {
-                    System_date[2] = 0x00;
+                    System_date[1] = 0x01;
+
+                    if(System_date[2] > 98)                                 // Рік
+                        {
+                        System_date[2] = 0x00;
+                        }
+                    else
+                        {
+                        System_date[2]++;
+                        }
                     }
                 else
                     {
-                    System_date[2]++;
+                    System_date[1]++;
                     }
                 }
             else
