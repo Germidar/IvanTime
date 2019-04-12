@@ -735,7 +735,7 @@ TWI_MasterInit(100);
 Get_RTC_time();
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
 dev_count = Search_ROM();
-TIMSK=0x11; // був - 91 потом 11
+TIMSK=0x11; // був - 91 потім 11
 
 
 while(1)
