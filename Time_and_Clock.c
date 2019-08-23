@@ -22,7 +22,7 @@ unsigned char I2C_Buff[9];
 unsigned char Day_in_Mounth[13] = {0xFF, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // Масив днів у місяцях
 //unsigned int Day_in_Mounth = 0b0000101011010101;  Масив днів у компактному режимі
 //                                   0.       F       7     1
-unsigned long beep_permit = 0b00000001101111111111111110000000; // Тестово
+unsigned long beep_permit = 0b00000001101111111111111110000000; // Дозвіл на погодинний сигнал
 
 void Get_RTC_time (void)                                                    // Отримання часту з ГРЧ
 {
@@ -81,10 +81,6 @@ if (System_time[seconds] > 58)                        // Секунди
     if (System_time[minutes] > 58)                    // Хвилини
         {
         System_time[minutes] = 0x00;
-        if ((My_SREG && 0x01) & (beep_permit >> System_time[hours]+1) & 0x01)   // Beep per Hour
-            {
-            beep_sound(200,3800);
-            }
         if (System_time[hours] > 22)                // Години
             {
             System_time[hours] = 0x00;
@@ -128,6 +124,13 @@ if (System_time[seconds] > 58)                        // Секунди
         else
             {
             System_time[hours]++;
+            }
+        if (My_SREG & 0x01)   // Beep per Hour
+            {
+            if ((beep_permit >> System_time[hours]) & 0x01)
+                {
+                beep_sound(200,3800);
+                }
             }
         }
     else
