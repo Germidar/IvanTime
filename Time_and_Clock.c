@@ -1,4 +1,14 @@
 #pragma used+
+
+#define seconds 2
+#define minutes 1
+#define hours   0
+
+#define day     3
+#define date    0
+#define month   1
+#define year    2
+
 void SysTime_incr (void);                                       // Підтримка роботи Системного часу
 
 unsigned char My_SREG = 0b00000101;                             // Системний регістр налаштувань годинника.
@@ -24,16 +34,16 @@ I2C_Buff[0] = 0b11010001;
 TWI_SendData(I2C_Buff,8);
 TWI_GetData(I2C_Buff,8);
 #asm("cli")
-System_time[2] = ((0x0F & I2C_Buff[1]) + ((0x70 & I2C_Buff[1])>>4) * 10);   // Секунди
-System_time[1] = ((0x0F & I2C_Buff[2]) + ((0x70 & I2C_Buff[2])>>4) * 10);   // Хвилини
-System_time[0] = ((0x0F & I2C_Buff[3]) + ((0x70 & I2C_Buff[3])>>4) * 10);   // Години
+System_time[seconds] = ((0x0F & I2C_Buff[1]) + ((0x70 & I2C_Buff[1])>>4) * 10);     // Секунди
+System_time[minutes] = ((0x0F & I2C_Buff[2]) + ((0x70 & I2C_Buff[2])>>4) * 10);     // Хвилини
+System_time[hours] = ((0x0F & I2C_Buff[3]) + ((0x70 & I2C_Buff[3])>>4) * 10);       // Години
 
-System_date[0] = ((0x0F & I2C_Buff[5]) + ((0x70 & I2C_Buff[5])>>4) * 10);   // День місяця
-System_date[1] = ((0x0F & I2C_Buff[6]) + ((0x70 & I2C_Buff[6])>>4) * 10);   // Місяць
-System_date[2] = ((0x0F & I2C_Buff[7]) + ((0x70 & I2C_Buff[7])>>4) * 10);   // Рік (десятки)
-System_date[3] = I2C_Buff[4];                                               // День неділі
+System_date[date] = ((0x0F & I2C_Buff[5]) + ((0x70 & I2C_Buff[5])>>4) * 10);        // День місяця
+System_date[month] = ((0x0F & I2C_Buff[6]) + ((0x70 & I2C_Buff[6])>>4) * 10);       // Місяць
+System_date[year] = ((0x0F & I2C_Buff[7]) + ((0x70 & I2C_Buff[7])>>4) * 10);        // Рік (десятки)
+System_date[day] = I2C_Buff[4];                                                     // День неділі
 
-if (System_date[2] % 4)     // Перевірка на високосний рік
+if (System_date[year] % 4)     // Перевірка на високосний рік
     {
     Day_in_Mounth[2] = 28;
     }
@@ -50,13 +60,13 @@ void Set_RTC_time (void)
 //I2C_Buff[1] = 0x00;
 //TWI_SendData(I2C_Buff,2);
 #asm("cli")
-I2C_Buff[2] = ((System_time[2] / 10) << 4) | (System_time[2] % 10);
-I2C_Buff[3] = ((System_time[1] / 10) << 4) | (System_time[1] % 10);
-I2C_Buff[4] = ((System_time[0] / 10) << 4) | (System_time[0] % 10);
-I2C_Buff[5] =   System_date[3];
-I2C_Buff[6] = ((System_date[0] / 10) << 4) | (System_date[0] % 10);
-I2C_Buff[7] = ((System_date[1] / 10) << 4) | (System_date[1] % 10);
-I2C_Buff[8] = ((System_date[2] / 10) << 4) | (System_date[2] % 10);
+I2C_Buff[2] = ((System_time[seconds] / 10) << 4) | (System_time[seconds] % 10);
+I2C_Buff[3] = ((System_time[minutes] / 10) << 4) | (System_time[minutes] % 10);
+I2C_Buff[4] = ((System_time[hours] / 10) << 4) | (System_time[hours] % 10);
+I2C_Buff[5] =   System_date[day];
+I2C_Buff[6] = ((System_date[date] / 10) << 4) | (System_date[date] % 10);
+I2C_Buff[7] = ((System_date[month] / 10) << 4) | (System_date[month] % 10);
+I2C_Buff[8] = ((System_date[year] / 10) << 4) | (System_date[year] % 10);
 #asm("sei")
 I2C_Buff[0] = 0b11010000;
 I2C_Buff[1] = 0x00;
@@ -65,69 +75,69 @@ TWI_SendData(I2C_Buff,9);
 
 void SysTime_incr (void)                        // Системний час
 {
-if (System_time[2] > 58)                        // Секунди
+if (System_time[seconds] > 58)                        // Секунди
     {
-    System_time[2] = 0x00;
-    if (System_time[1] > 58)                    // Хвилини
+    System_time[seconds] = 0x00;
+    if (System_time[minutes] > 58)                    // Хвилини
         {
-        System_time[1] = 0x00;
-        if ((My_SREG && 0x01) & (beep_permit >> System_time[0]+1) & 0x01)   // Beep per Hour
+        System_time[minutes] = 0x00;
+        if ((My_SREG && 0x01) & (beep_permit >> System_time[hours]+1) & 0x01)   // Beep per Hour
             {
             beep_sound(200,3800);
             }
-        if (System_time[0] > 22)                // Години
+        if (System_time[hours] > 22)                // Години
             {
-            System_time[0] = 0x00;
+            System_time[hours] = 0x00;
 
-            if (System_date[3] > 6)             // День неділі
+            if (System_date[day] > 6)             // День неділі
                 {
-                System_date[3] = 0x01;
+                System_date[day] = 0x01;
                 }
             else
                 {
-                System_date[3]++;
+                System_date[day]++;
                 }
 
-            if (System_date[0] >= Day_in_Mounth[System_date[1]])            // Доба (День місяця/Дата)
+            if (System_date[date] >= Day_in_Mounth[System_date[month]])            // Доба (День місяця/Дата)
                 {
-                System_date[0] = 0x01;
+                System_date[date] = 0x01;
 
-                if(System_date[1] > 11)                                     // Місяць
+                if(System_date[month] > 11)                                     // Місяць
                     {
-                    System_date[1] = 0x01;
+                    System_date[month] = 0x01;
 
-                    if(System_date[2] > 98)                                 // Рік
+                    if(System_date[year] > 98)                                 // Рік
                         {
-                        System_date[2] = 0x00;
+                        System_date[year] = 0x00;
                         }
                     else
                         {
-                        System_date[2]++;
+                        System_date[year]++;
                         }
                     }
                 else
                     {
-                    System_date[1]++;
+                    System_date[month]++;
                     }
                 }
             else
                 {
-                System_date[0]++;
+                System_date[date]++;
                 }
             }
         else
             {
-            System_time[0]++;
+            System_time[hours]++;
             }
         }
     else
         {
-        System_time[1]++;
+        System_time[minutes]++;
         }
     }
 else
     {
-    System_time[2]++;
+    System_time[seconds]++;
     }
 }
 #pragma used-

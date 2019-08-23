@@ -55,57 +55,57 @@ switch (Display_System_Status)
     {
     case 0x01:
     // Дисплей годинника
-    Disp[3] = System_time[1] % 10;          // одиниці хвилин
-    Disp[2] = System_time[1] / 10;          // десятки хвилин
-    Disp[1] = System_time[0] % 10;          // одиниці годин
+    Disp[3] = System_time[minutes] % 10;    // одиниці хвилин
+    Disp[2] = System_time[minutes] / 10;    // десятки хвилин
+    Disp[1] = System_time[hours] % 10;      // одиниці годин
     if (My_SREG & 0x02)                     // Відкидання десятків годин, якщо меньше 10 годин.
         {
-        Disp[0] = System_time[0] / 10;      // десятки годин
+        Disp[0] = System_time[hours] / 10;  // десятки годин
         }
     else
         {
-        if (System_time[0] < 10)
+        if (System_time[hours] < 10)
             {
             Disp[0] = 28;
             }
         else
             {
-            Disp[0] = System_time[0] / 10;
+            Disp[0] = System_time[hours] / 10;
             }
         }
     // Дисплей темератури
-    Disp[7] = Sys_Temp[curr_dev][3];                  // Дробова частина
-    Disp[6] = Sys_Temp[curr_dev][2] + 10;             // Одиниці
-    Disp[5] = Sys_Temp[curr_dev][1];                  // Десятки
-    Disp[4] = Sys_Temp[curr_dev][0];                  // Сотні
+    Disp[7] = Sys_Temp[curr_dev][3];                // Дробова частина
+    Disp[6] = Sys_Temp[curr_dev][2] + 10;           // Одиниці
+    Disp[5] = Sys_Temp[curr_dev][1];                // Десятки
+    Disp[4] = Sys_Temp[curr_dev][0];                // Сотні
 
-    Disp[8] = System_date[3] + 19;  // Дні неділі
-    Disp[9] = 21 + curr_dev;        // Номер датчика для відображення
-    if (0x00 == System_time[2] % 0x02)      // Блимач
+    Disp[8] = System_date[day] + 19;                // Дні неділі
+    Disp[9] = 21 + curr_dev;                        // Номер датчика для відображення
+    if (0x00 == System_time[seconds] % 0x02)        // Блимач
         {
         Disp[1] = Disp[1] + 0x0A;
         }
     break;
 
-    case 0x02:                              // Відображення Числа місяця та року на дислпеї
+    case 0x02:                                      // Відображення Числа місяця та року на дислпеї
     // Дисплей дати
-    Disp[3] = System_date[1] % 10;          //Mounth ED
-    Disp[2] = System_date[1] / 10;          //Mounth Dec
-    Disp[1] = System_date[0] % 10 + 10;     //Dat ED
-    Disp[0] = System_date[0] / 10;          //Dat Dec
+    Disp[3] = System_date[month] % 10;          //Mounth ED
+    Disp[2] = System_date[month] / 10;          //Mounth Dec
+    Disp[1] = System_date[date] % 10 + 10;      //Dat ED
+    Disp[0] = System_date[date] / 10;           //Dat Dec
     // Дисплей року
-    Disp[7] = System_date[2] % 10;          //Year ED
-    Disp[6] = System_date[2] / 10;          //Year Dec
-    Disp[5] = System_date[4] % 10;          //Year Sot
-    Disp[4] = System_date[4] / 10;          //Year Tis
+    Disp[7] = System_date[year] % 10;           //Year ED
+    Disp[6] = System_date[year] / 10;           //Year Dec
+    Disp[5] = System_date[4] % 10;              //Year Sot
+    Disp[4] = System_date[4] / 10;              //Year Tis
     // Індикатор дня тижня
-    Disp[8] = System_date[3] + 19; //Дні неділі;
+    Disp[8] = System_date[day] + 19;            //Дні неділі;
     Disp[9] = 0x1C;
     break;
 
     case 0x10:      // Редагування хвилин (0 - 59)
-    Disp[3] = System_time[1] % 10;          // одиниці хвилин
-    Disp[2] = System_time[1] / 10;          // десятки хвилин
+    Disp[3] = System_time[minutes] % 10;        // одиниці хвилин
+    Disp[2] = System_time[minutes] / 10;        // десятки хвилин
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
     Disp[4] = 0x1C;
@@ -117,20 +117,20 @@ switch (Display_System_Status)
     break;
 
     case 0x11:      // Редагування годин (0 - 23*)
-    Disp[1] = System_time[0] % 10;          // одиниці годин
-    if (My_SREG & 0x02)                     // Відкидання десятків годин, якщо меньше 10 годин.
+    Disp[1] = System_time[hours] % 10;          // одиниці годин
+    if (My_SREG & 0x02)                         // Відкидання десятків годин, якщо меньше 10 годин.
         {
-        Disp[0] = System_time[0] / 10;      // десятки годин
+        Disp[0] = System_time[hours] / 10;      // десятки годин
         }
     else
         {
-        if (System_time[0] < 10)
+        if (System_time[hours] < 10)
             {
             Disp[0] = 28;
             }
         else
             {
-            Disp[0] = System_time[0] / 10;
+            Disp[0] = System_time[hours] / 10;
             }
         }
     Disp[2] = 0x1C;
@@ -144,8 +144,8 @@ switch (Display_System_Status)
     break;
 
     case 0x12:      // Редагування числа місяця (1 - 31*)
-    Disp[1] = System_date[0] % 10 + 10;     //Dat ED
-    Disp[0] = System_date[0] / 10;          //Dat Dec
+    Disp[1] = System_date[date] % 10 + 10;     //Dat ED
+    Disp[0] = System_date[date] / 10;          //Dat Dec
     Disp[2] = 0x1C;
     Disp[3] = 0x1C;
     Disp[4] = 0x1C;
@@ -157,8 +157,8 @@ switch (Display_System_Status)
     break;
 
     case 0x13:      // Редагування номера місяця (1 - 12)
-    Disp[3] = System_date[1] % 10;          //Mounth ED
-    Disp[2] = System_date[1] / 10;          //Mounth Dec
+    Disp[3] = System_date[month] % 10;          //Mounth ED
+    Disp[2] = System_date[month] / 10;          //Mounth Dec
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
     Disp[4] = 0x1C;
@@ -170,10 +170,10 @@ switch (Display_System_Status)
     break;
 
     case 0x14:      // Редагування року
-    Disp[7] = System_date[2] % 10;          //Year ED
-    Disp[6] = System_date[2] / 10;          //Year Dec
-    Disp[5] = System_date[4] % 10;          //Year Sot
-    Disp[4] = System_date[4] / 10;          //Year Tis
+    Disp[7] = System_date[year] % 10;           //Year ED
+    Disp[6] = System_date[year] / 10;           //Year Dec
+    Disp[5] = System_date[4] % 10;              //Year Sot
+    Disp[4] = System_date[4] / 10;              //Year Tis
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
     Disp[2] = 0x1C;
@@ -183,7 +183,7 @@ switch (Display_System_Status)
     break;
 
     case 0x15:      // Встановлення дня неділі
-    Disp[8] = System_date[3] + 19; //Дні неділі
+    Disp[8] = System_date[day] + 19; //Дні неділі
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
     Disp[2] = 0x1C;
@@ -267,53 +267,53 @@ switch (Display_System_Status)
     break;
 
     case 0x10:      // Редагування хвилин (0 - 59)
-    if (System_time[1] <= 0x00)
+    if (System_time[minutes] <= 0x00)
         {
-        System_time[1] = 59;
+        System_time[minutes] = 59;
         }
     else
         {
-        System_time[1]--;
+        System_time[minutes]--;
         }
     break;
 
     case 0x11:      // Редагування годин (0 - 23*)
-    if (System_time[0] <= 0)
+    if (System_time[hours] <= 0)
         {
-        System_time[0] = 23;
+        System_time[hours] = 23;
         }
     else
         {
-        System_time[0]--;
+        System_time[hours]--;
         }
     break;
 
     case 0x12:      // Редагування числа місяця (1 - 31*)
-    if (System_date[0] <= 1)
+    if (System_date[date] <= 1)
         {
-        System_date[0] = Day_in_Mounth[System_date[1]];
+        System_date[date] = Day_in_Mounth[System_date[month]];
         }
     else
         {
-        System_date[0]--;
+        System_date[date]--;
         }
     break;
 
     case 0x13:      // Редагування номера місяця (1 - 12)
-    if (System_date[1] <= 1)
+    if (System_date[month] <= 1)
         {
-        System_date[1] = 12;
+        System_date[month] = 12;
         }
     else
         {
-        System_date[1]--;
+        System_date[month]--;
         }
     break;
 
     case 0x14:      // Редагування року
-    if (System_date[2] <= 0)
+    if (System_date[year] <= 0)
         {
-        System_date[2] = 99;
+        System_date[year] = 99;
         if (System_date[4] <= 0)
             {
             System_date[4] = 99;
@@ -325,18 +325,18 @@ switch (Display_System_Status)
         }
     else
         {
-        System_date[2]--;
+        System_date[year]--;
         }
     break;
 
     case 0x15:      // Встановлення дня неділі
-    if (System_date[3] <= 1)
+    if (System_date[day] <= 1)
         {
-        System_date[3] = 7;
+        System_date[day] = 7;
         }
     else
         {
-        System_date[3]--;
+        System_date[day]--;
         }
     break;
 
@@ -365,53 +365,53 @@ switch (Display_System_Status)
     break;
 
     case 0x10:      // Редагування хвилин (0 - 59)
-    if (System_time[1] >= 59)
+    if (System_time[minutes] >= 59)
         {
-        System_time[1] = 0;
+        System_time[minutes] = 0;
         }
     else
         {
-        System_time[1]++;
+        System_time[minutes]++;
         }
     break;
 
     case 0x11:      // Редагування годин (0 - 23*)
-    if (System_time[0] >= 23)
+    if (System_time[hours] >= 23)
         {
-        System_time[0] = 0;
+        System_time[hours] = 0;
         }
     else
         {
-        System_time[0]++;
+        System_time[hours]++;
         }
     break;
 
     case 0x12:      // Редагування числа місяця (1 - 31*)
-    if (System_date[0] >= Day_in_Mounth[System_date[1]])
+    if (System_date[date] >= Day_in_Mounth[System_date[month]])
         {
-        System_date[0] = 1;
+        System_date[date] = 1;
         }
     else
         {
-        System_date[0]++;
+        System_date[date]++;
         }
     break;
 
     case 0x13:      // Редагування номера місяця (1 - 12)
-    if (System_date[1] >= 12)
+    if (System_date[month] >= 12)
         {
-        System_date[1] = 1;
+        System_date[month] = 1;
         }
     else
         {
-        System_date[1]++;
+        System_date[month]++;
         }
     break;
 
     case 0x14:      // Редагування року
-    if (System_date[2] >= 99)
+    if (System_date[year] >= 99)
         {
-        System_date[2] = 0;
+        System_date[year] = 0;
         if (System_date[4] >= 99)
             {
             System_date[4] = 0;
@@ -423,18 +423,18 @@ switch (Display_System_Status)
         }
     else
         {
-        System_date[2]++;
+        System_date[year]++;
         }
     break;
 
     case 0x15:      // Встановлення дня неділі
-    if (System_date[3] >= 7)
+    if (System_date[day] >= 7)
         {
-        System_date[3] = 1;
+        System_date[day] = 1;
         }
     else
         {
-        System_date[3]++;
+        System_date[day]++;
         }
     break;
 
