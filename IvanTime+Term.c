@@ -7,7 +7,7 @@
 #include <DS18Bxx.c>
 
 
-unsigned char Disp[10];       //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    Пн    Вт    Ср    Чт    Пт    Сб    Нд    -    " "
+unsigned char Disp[10];      //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    Пн    Вт    Ср    Чт    Пт    Сб    Нд    -    " "
 flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0xBF, 0x86, 0xDB, 0xCF, 0xE6, 0xED, 0xFD, 0x87, 0xFF, 0xEF, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x40, 0x00};     //Оголошення масиву символів від 0 до 9 СC
 
 
@@ -23,6 +23,7 @@ unsigned char buttn_M_hold;             // час утримування кнопки M для переходу
 unsigned char display_refresh = 0xFF;   // період оновлення дисплею
 unsigned char curr_dev = 0x00;          // Номер датчика температури для відображення
 unsigned char conv_need = 0xFF;         // Прапорець необхідності виконання конвертації температури датчиками
+unsigned char TMP = 0x00;
 unsigned int  TEMP = 0x00;
 
 void save_settings_to_eeprom ();
@@ -195,8 +196,42 @@ switch (Display_System_Status)
     Disp[9] = 0x1C;
     break;
 
-    case 0x16:      //
+    case 0x16:
 
+    break;
+
+    case 0x17:     // Edit beep hour sigal
+    Disp[0] = 0x1C;
+    if (My_SREG & 0x02)                     // Відкидання десятків годин, якщо меньше 10 годин.
+        {
+        Disp[1] = TMP / 10;  // десятки годин
+        }
+    else
+        {
+        if (TMP < 10)
+            {
+            Disp[1] = 28;
+            }
+        else
+            {
+            Disp[1] = TMP / 10;
+            }
+        }
+    Disp[2] = TMP % 10;
+    Disp[3] = 0x1C;
+    Disp[4] = 0x1C;
+    Disp[5] = 0x1C;
+    Disp[6] = 0x1C;
+    Disp[7] = 0x1C;
+    Disp[8] = 0x1C;
+    if ((beep_permit >> TMP) & 0x01)
+        {
+        Disp[9] = 0x03;
+        }
+    else
+        {
+        Disp[9] = 0x1C;
+        }
     break;
 
     default:
@@ -340,8 +375,19 @@ switch (Display_System_Status)
         }
     break;
 
-    case 0x16:      //
+    case 0x16:
 
+    break;
+
+    case 0x17:      // Встановлення щогодинного сигналу
+    if (TMP > 0)
+        {
+        TMP--;
+        }
+    else
+        {
+        TMP = 23;
+        }
     break;
 
     default:
@@ -438,8 +484,19 @@ switch (Display_System_Status)
         }
     break;
 
-    case 0x16:      //
+    case 0x16:
 
+    break;
+
+    case 0x17:      // Встановлення щогодинного сигналу
+    if (TMP < 23)
+        {
+        TMP++;
+        }
+    else
+        {
+        TMP = 0x00;
+        }
     break;
 
     default:
@@ -466,8 +523,40 @@ switch (Display_System_Status)
         }
     break;
 
-    case 0x16:
+    case 0x15:
     Display_System_Status = 0x10;
+    break;
+
+    case 0x17:
+    if (buttn_M_hold > 0x01)
+        {
+        save_settings_to_eeprom();
+        Display_System_Status = 0x10;
+        button_pushed[2] = 0x00;
+        button_hold[2] = 0x00;
+        buttn_M_hold = 0x00;
+        }
+    else
+        {
+        if (TMP < 16)
+            {
+            beep_permit ^= 1 << TMP;
+            }
+        else
+            {
+            TEMP = beep_permit;
+            beep_permit = (beep_permit >> 16);
+            TMP -= 16;
+            beep_permit ^= 1 << TMP;
+            TMP += 16;
+            //delay_ms(500);
+            beep_permit = (beep_permit << 16);
+            beep_permit += TEMP;
+            }
+        button_pushed[2] = 0x00;
+        button_hold[2] = 0x00;
+        buttn_M_hold = 0x00;
+        }
     break;
 
     default:
@@ -632,7 +721,10 @@ switch (bttn)
     case 0x04:  // Натиснуті кнопки KM "-" "Mute/set/option"
     if (bttn == 0x04)
         {
-
+        if (Display_System_Status > 0x10)   // Перехід у режим коригуваннь щогодинного сигналу
+            {
+            Display_System_Status = 0x17;
+            }
         }
     break;
 
@@ -663,15 +755,17 @@ refr_temp_dev =     EEPROM_read(0x0013);
 //abval =           EEPROM_read(0x0016);
 display_refresh =   EEPROM_read(0x0017);
 
-TEMP = EEPROM_read(0x0018);
-beep_permit = TEMP;
-TEMP = EEPROM_read(0x0019);
-beep_permit = (beep_permit << 8) + TEMP;
-EEPROM_read(0x001A);
-beep_permit = (beep_permit << 16) + TEMP;
-EEPROM_read(0x001B);
-beep_permit = (beep_permit << 24) + TEMP;
-TEMP = 0x00;
+beep_permit = EEPROM_read(0x001B);
+beep_permit = beep_permit << 8;
+TMP = EEPROM_read(0x001A);
+beep_permit += TMP;
+TMP = EEPROM_read(0x0019);
+beep_permit = beep_permit << 8;
+beep_permit += TMP;
+TMP = EEPROM_read(0x0018);
+beep_permit = beep_permit << 8;
+beep_permit += TMP;
+TMP = 0x00;
 }
 
 void save_settings_to_eeprom (void)
@@ -687,13 +781,13 @@ EEPROM_write(0x0013,refr_temp_dev);
 EEPROM_write(0x0017,display_refresh);
 
 dta = beep_permit;
-EEPROM_write(0x001B,dta);
-dta = beep_permit >> 8;
-EEPROM_write(0x001A,dta);
-dta = beep_permit >> 16;
-EEPROM_write(0x0019,dta);
-dta = beep_permit >> 24;
 EEPROM_write(0x0018,dta);
+dta = beep_permit >> 8;
+EEPROM_write(0x0019,dta);
+dta = beep_permit >> 16;
+EEPROM_write(0x001A,dta);
+dta = beep_permit >> 24;
+EEPROM_write(0x001B,dta);
 }
 
 void main (void)
@@ -730,7 +824,7 @@ TCNT0=0xFF;
 // Global enable interrupts
 #asm("sei")
 
-//load_settings_from_eeprom();    // Завантаження налаштуваннь пристрою з EEPROM
+load_settings_from_eeprom();    // Завантаження налаштуваннь пристрою з EEPROM
 TWI_MasterInit(100);
 Get_RTC_time();
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення

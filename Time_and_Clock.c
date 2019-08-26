@@ -22,7 +22,7 @@ unsigned char I2C_Buff[9];
 unsigned char Day_in_Mounth[13] = {0xFF, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // Масив днів у місяцях
 //unsigned int Day_in_Mounth = 0b0000101011010101;  Масив днів у компактному режимі
 //                                   0.       F       7     1
-unsigned long beep_permit = 0b00000001101111111111111110000000; // Дозвіл на погодинний сигнал
+unsigned long beep_permit = 0b00000000001111111111111110000000; // Дозвіл на погодинний сигнал
 
 void Get_RTC_time (void)                                                    // Отримання часту з ГРЧ
 {
