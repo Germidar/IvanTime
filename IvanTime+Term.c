@@ -754,7 +754,6 @@ refr_temp_dev =     EEPROM_read(0x0013);
 //var_2 =           EEPROM_read(0x0015);
 //abval =           EEPROM_read(0x0016);
 display_refresh =   EEPROM_read(0x0017);
-
 beep_permit = EEPROM_read(0x001B);
 beep_permit = beep_permit << 8;
 TMP = EEPROM_read(0x001A);
@@ -824,7 +823,10 @@ TCNT0=0xFF;
 // Global enable interrupts
 #asm("sei")
 
-load_settings_from_eeprom();    // Завантаження налаштуваннь пристрою з EEPROM
+if(PINB.4)
+    {
+    load_settings_from_eeprom();    // Завантаження налаштуваннь пристрою з EEPROM
+    }
 TWI_MasterInit(100);
 Get_RTC_time();
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
@@ -847,13 +849,12 @@ while(1)
             }
         else
         	{
-        	if (rt_sec >= refr_temp_dev && conv_need)   // + прапорець запуску конвертування температури.
+        	if (conv_need && rt_sec >= refr_temp_dev)   // + прапорець запуску конвертування температури.
                 {
         		Convert_Temperature();                  // Convert T
                 conv_need = 0x00;
         		}
         	}
 		}
-
     }
 }
