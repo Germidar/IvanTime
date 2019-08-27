@@ -12,7 +12,7 @@ if (cfg_pwm & 0x01)
     {
     TCCR2 = 0b11101010;     //(1<<PWM2) | (0<<COM21) | (1<<COM20) | (1<<CTC2) | (0<<CS22) | (1<<CS21) | (0<<CS20);
     OCR2 = brightness;
-    PORTB.5 = 0xFF;
+    PORTB.5 = 0x00;
     }
 }
 
@@ -33,7 +33,7 @@ else
     if (cfg_pwm & 0x01)
         {
         TCCR2 = 0x00;
-        PORTB.5 = 0xFF;
+        PORTB.5 = 0x00;
         }
     }
 }
@@ -44,7 +44,7 @@ beep = Time_in_ms / 2;      // Визначення часу звучання біпера
 cfg_pwm &= 0xFE;            // cfg_pwm bit0 = 0 "Sound_mode"
 TCCR2=(0<<PWM2) | (0<<COM21) | (1<<COM20) | (1<<CTC2) | (0<<CS22) | (1<<CS21) | (0<<CS20);
 OCR2 = (1000000 / (frequency * 2)) - 1;               //
-PORTB.5 = 0x00;
+PORTB.5 = 0xFF;
 }
 
 #pragma used-
