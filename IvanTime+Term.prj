@@ -6,7 +6,7 @@ A=
 C=
 D=06.01.2015 18:07:35
 Files=1
-OpenedFiles=4
+OpenedFiles=5
 OutputListFilesDirectory=List
 OutputObjectFilesDirectory=Obj
 OutputExecutableFilesDirectory=Exe
@@ -21,7 +21,7 @@ PageIndex0=0
 OF1=IvanTime+Term.c
 Active1=0
 EditorPanel1=0
-TimeStamp1=1327170511
+TimeStamp1=1327218453
 PageIndex1=1
 ActiveTab=1
 ActiveBuildConfiguration=0
@@ -32,22 +32,22 @@ DebugOutputLinkerFilesDirectory=Debug\Link
 OF2=Time_and_Clock.c
 Active2=0
 EditorPanel2=0
-TimeStamp2=1327152592
+TimeStamp2=1327236439
 PageIndex2=2
 OF3=timer_mode_manager.c
-Active3=1
+Active3=0
 EditorPanel3=0
-TimeStamp3=1326976249
+TimeStamp3=1327218068
 PageIndex3=3
 OF4=Debug\List\IvanTime+Term.map
 Active4=0
 EditorPanel4=0
-TimeStamp4=1327170625
+TimeStamp4=1327236408
 PageIndex4=4
-OF5=1-wire.c
-Active5=0
+OF5=Debug\List\IvanTime+Term.asm
+Active5=1
 EditorPanel5=0
-TimeStamp5=1326976249
+TimeStamp5=1327236408
 PageIndex5=5
 F1=IvanTime+Term.c
 OF6=C:\cvavr\inc\delay.h
@@ -152,7 +152,7 @@ WarningUnknownPragma=1
 LinkerWarnings=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-Build=1307
+Build=1309
 UseEEPROMLocation0=1
 IncludePath0=
 IncludePath1=
@@ -384,7 +384,7 @@ Row=8
 Column=0
 ScrollPosX=0
 ScrollPosY=0
-TimeStamp=1327171251
+TimeStamp=1327994707
 [BookmarksFoldedCode]
 Files=21
 F1=D:\AVR\IvanTime\IvanTime+Term.c
@@ -427,11 +427,11 @@ BK9=-1
 [FoldedCode1]
 Blocks=0
 [Bookmarks2]
-TimeStamp=1327170511
-Row=825
-Column=11
+TimeStamp=1327218453
+Row=253
+Column=29
 ScrollPosX=0
-ScrollPosY=812
+ScrollPosY=58
 BK0=-1
 BK1=-1
 BK2=-1
@@ -445,7 +445,7 @@ BK9=-1
 [CompilerDebug]
 RebuildAll=0
 LinkageInformationPresent=1
-Build=1307
+Build=1309
 UseEEPROMLocation0=1
 Chip=ATmega8A
 CPUClock=8000000
@@ -542,7 +542,7 @@ WarningStaticRamEepromStorageAllocConstStrLit=0
 WarningRegisterAddressXMEGA=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-COFFileTimeStamp=1327235338
+COFFileTimeStamp=1327236408
 [BuildInfoCompiler]
 L1=Build configuration: Debug
 L2=Chip: ATmega8A
@@ -560,8 +560,8 @@ L13=Enhanced function parameters passing: Yes
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 1307
-L18=2894 line(s) compiled
+L17=Build: 1308
+L18=2895 line(s) compiled
 L19=No errors
 L20=3 warning(s)
 L21=
@@ -586,7 +586,7 @@ Lines=37
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=Z:\home\germidar\MK_Projects\IvanTime\Debug\List\IvanTime+Term.asm(6442): No EEPROM data, deleting Z:\home\germidar\MK_Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
+L4=Z:\home\germidar\MK_Projects\IvanTime\Debug\List\IvanTime+Term.asm(6443): No EEPROM data, deleting Z:\home\germidar\MK_Projects\IvanTime\Debug\Exe\IvanTime+Term.eep
 L5=
 L6=ATmega8A memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
@@ -727,11 +727,11 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks10]
-TimeStamp=1327152592
-Row=22
-Column=33
+TimeStamp=1327236439
+Row=13
+Column=27
 ScrollPosX=0
-ScrollPosY=51
+ScrollPosY=18
 BK0=-1
 BK1=-1
 BK2=-1
@@ -855,11 +855,11 @@ BK9=-1
 [FoldedCode16]
 Blocks=0
 [Bookmarks17]
-TimeStamp=1326976249
-Row=46
-Column=12
+TimeStamp=1327218068
+Row=18
+Column=5
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=18
 BK0=-1
 BK1=-1
 BK2=-1
@@ -875,11 +875,11 @@ Blocks=0
 [FoldedCode7]
 Blocks=0
 [Bookmarks18]
-TimeStamp=1287634712
-Row=1094
-Column=24
+TimeStamp=1327236408
+Row=4136
+Column=44
 ScrollPosX=0
-ScrollPosY=1195
+ScrollPosY=4154
 BK0=-1
 BK1=-1
 BK2=-1
@@ -891,11 +891,11 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks19]
-TimeStamp=1327170625
-Row=84
-Column=12
+TimeStamp=1327236408
+Row=40
+Column=3
 ScrollPosX=0
-ScrollPosY=66
+ScrollPosY=21
 BK0=-1
 BK1=-1
 BK2=-1
@@ -922,8 +922,6 @@ BK6=-1
 BK7=-1
 BK8=-1
 BK9=-1
-[FoldedCode18]
-Blocks=0
 [FoldedCode20]
 Blocks=0
 [Bookmarks21]
@@ -948,14 +946,6 @@ Blocks=0
 Blocks=0
 [FoldedCode21]
 Blocks=0
-[FoldedCode2]
-Blocks=0
-[FoldedCode19]
-Blocks=0
-[FoldedCode17]
-Blocks=0
-[FoldedCode10]
-Blocks=0
 [HeadersList]
 Files=1
 F1=Z:\home\germidar\MK_Projects\IvanTime\IvanTime+Term.c
@@ -972,3 +962,14 @@ F8=timer_mode_manager.c
 F9=Time_and_Clock.c
 F10=1-wire.c
 F11=DS18Bxx.c
+[FoldedCode2]
+Line1=53
+Blocks=1
+[FoldedCode18]
+Blocks=0
+[FoldedCode19]
+Blocks=0
+[FoldedCode17]
+Blocks=0
+[FoldedCode10]
+Blocks=0
