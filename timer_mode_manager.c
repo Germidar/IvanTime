@@ -1,5 +1,5 @@
 #pragma used+
-unsigned char cfg_pwm = 0x81;   // регістр конфігурації режиму таймера
+unsigned char cfg_pwm = 0x01;   // регістр конфігурації режиму таймера
                                 // bit 0: =1 PWM | =0 SQW
                                 // bit 7: =1 auto_brightness ON | =0 auto_brightness 0FF
 unsigned char adctmp;
@@ -23,8 +23,10 @@ if (cfg_pwm & 0x80)     // Перевірка на дозвіл зміни яскравості дисплея
     ADMUX = 0b00100111;
     ADCSRA = 0b10100101;
     delay_ms(1);
+    //#asm("nop")
     ADCSRA = 0b11000101;
     delay_ms(1);
+    //#asm("nop")
     adctmp = ADCH;
     set_brightness(adctmp);
     }

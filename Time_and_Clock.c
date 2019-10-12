@@ -15,9 +15,11 @@ unsigned char My_SREG = 0b00000101;                             // Системний рег
                                                                 // bit 0: =1 beep_per_hour ON       | =0 beep_per_hour OFF
                                                                 // bit 1: =1 hide_zerro_hour OFF    | =0 hide_zerro_hour ON
                                                                 // bit 2: =1 sound_buttons ON       | =0 sound_buttons OFF
+                                                                // bit 3: =1 autoChange device ON   | =0 autoChange device OFF
 
-unsigned char System_time [3] = {0, 0, 0};                      // Годии, хвилини, секунди
-unsigned char System_date [5] = {0, 0, 0, 1, 20};               // Число, Місяць, Рік (десятки), День неділі, Рік (Сотні)
+
+unsigned char System_time [3] = {8, 23, 17};                      // Годии, хвилини, секунди
+unsigned char System_date [5] = {12, 10, 19, 1, 20};               // Число, Місяць, Рік (десятки), День неділі, Рік (Сотні)
 unsigned char I2C_Buff[9];
 unsigned char Day_in_Mounth[13] = {0xFF, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // Масив днів у місяцях
 //unsigned int Day_in_Mounth = 0b0000101011010101;  Масив днів у компактному режимі
