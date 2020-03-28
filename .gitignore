@@ -14,7 +14,7 @@
 *.PWI
 *.?~
 *.???~
-*.LYT
+#*.LYT
 *.cproj
 *.bmp
 *.aps
