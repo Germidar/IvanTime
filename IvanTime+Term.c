@@ -8,9 +8,8 @@
 
 
 unsigned char Disp[10];      //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    Пн    Вт    Ср    Чт    Пт    Сб    Нд    -    " "
-//flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0xBF, 0x86, 0xDB, 0xCF, 0xE6, 0xED, 0xFD, 0x87, 0xFF, 0xEF, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x40, 0x00};     //Оголошення масиву символів від 0 до 9 СC
-flash unsigned char simv[29] = {0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8, 0x80, 0x90, 0x40, 0x79, 0x24, 0x30, 0x19, 0x12, 0x02, 0x78, 0x00, 0x10, 0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0xBF, 0xFF};     //Оголошення масиву символів від 0 до 9 СC
-
+flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0xBF, 0x86, 0xDB, 0xCF, 0xE6, 0xED, 0xFD, 0x87, 0xFF, 0xEF, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x40, 0x00};     //Оголошення масиву символів від 0 до 9 СC
+//flash unsigned char simv[29] = {0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8, 0x80, 0x90, 0x40, 0x79, 0x24, 0x30, 0x19, 0x12, 0x02, 0x78, 0x00, 0x10, 0xFE, 0xFD, 0xFB, 0xF7, 0xEF, 0xDF, 0xBF, 0xBF, 0xFF};     //Оголошення масиву символів від 0 до 9 СC
 
 unsigned char Display_System_Status = 0x01;
 unsigned char xscr;
@@ -20,6 +19,7 @@ unsigned char button_pushed[3];
 unsigned char button_hold[3];
 unsigned char rt_sec = 0x08;            // Час піся останнього оновлення температури
 unsigned char refr_temp_dev = 0x09;     // період оновлення датчиків температури
+unsigned char timeToChangeDev = 0x05;   // час перемикання з одного датчика на інший
 unsigned char buttn_M_hold;             // час утримування кнопки M для переходу до режиму налажтуваннь
 unsigned char display_refresh = 0xFF;   // період оновлення дисплею
 unsigned char curr_dev = 0x00;          // Номер датчика температури для відображення
@@ -111,8 +111,8 @@ switch (Display_System_Status)
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
     Disp[4] = 0x1C;
-    Disp[5] = 0x1C;
-    Disp[6] = 0x1C;
+    Disp[5] = System_time[seconds] / 10;
+    Disp[6] = System_time[seconds] % 10;
     Disp[7] = 0x1C;
     Disp[8] = 0x15;
     Disp[9] = 0x1C;
@@ -243,6 +243,7 @@ switch (Display_System_Status)
 void SysTemp_incr (void)
 {
 rt_sec++;
+//timeToDisplayDevice++;
 }
 
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)  // Оновлення дисплею + Sound multipler
@@ -274,7 +275,7 @@ else
     else
         {
         cfg_pwm |= 0x01;        // bit0 = 1 "PWM_mode"
-        auto_brightness();
+        auto_brightness();      // Виконується довще ніх 2 мс! Вдосконалити алгоритм.
         }
     }
 }
@@ -715,7 +716,12 @@ switch (bttn)
     case 0x10:  // Натиснуті кнопки KL "-" "+"
     if (bttn == 0x10)
         {
-
+        if(Display_System_Status == 0x10)   // Seconds reset
+            {
+            System_time[seconds] = 0x00;
+            TCNT1 = 0x0000;
+            Display_refr();
+            }
         }
     break;
 
@@ -830,7 +836,6 @@ if(PINB.4)
     }
 TWI_MasterInit(100);
 Get_RTC_time();
-TCCR2 = 0b11101010;
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
 dev_count = Search_ROM();
 TIMSK=0x11; // був - 91 потім 11
@@ -851,7 +856,7 @@ while(1)
             }
         else
         	{
-        	if (conv_need && rt_sec >= refr_temp_dev)   // + прапорець запуску конвертування температури.
+        	if (conv_need && (rt_sec >= refr_temp_dev))   // + прапорець запуску конвертування температури.
                 {
         		Convert_Temperature();                  // Convert T
                 conv_need = 0x00;
