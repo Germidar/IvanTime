@@ -105,20 +105,7 @@ switch (Display_System_Status)
     Disp[9] = 0x1C;
     break;
 
-    case 0x10:      // Редагування хвилин (0 - 59)
-    Disp[3] = System_time[minutes] % 10;        // одиниці хвилин
-    Disp[2] = System_time[minutes] / 10;        // десятки хвилин
-    Disp[0] = 0x1C;
-    Disp[1] = 0x1C;
-    Disp[4] = 0x1C;
-    Disp[5] = System_time[seconds] / 10;
-    Disp[6] = System_time[seconds] % 10;
-    Disp[7] = 0x1C;
-    Disp[8] = 0x15;
-    Disp[9] = 0x1C;
-    break;
-
-    case 0x11:      // Редагування годин (0 - 23*)
+    case 0x10:      // Редагування годин (0 - 23*)
     Disp[1] = System_time[hours] % 10;          // одиниці годин
     if (My_SREG & 0x02)                         // Відкидання десятків годин, якщо меньше 10 годин.
         {
@@ -138,8 +125,22 @@ switch (Display_System_Status)
     Disp[2] = 0x1C;
     Disp[3] = 0x1C;
     Disp[4] = 0x1C;
-    Disp[5] = 0x1C;
-    Disp[6] = 0x1C;
+    Disp[5] = System_time[seconds] / 10;
+    Disp[6] = System_time[seconds] % 10;
+    Disp[7] = 0x1C;
+    Disp[8] = 0x15;
+    Disp[9] = 0x1C;
+        
+    break;
+
+    case 0x11:      // Редагування хвилин (0 - 59)
+    Disp[3] = System_time[minutes] % 10;        // одиниці хвилин
+    Disp[2] = System_time[minutes] / 10;        // десятки хвилин
+    Disp[0] = 0x1C;
+    Disp[1] = 0x1C;
+    Disp[4] = 0x1C;
+    Disp[5] = System_time[seconds] / 10;
+    Disp[6] = System_time[seconds] % 10;
     Disp[7] = 0x1C;
     Disp[8] = 0x16;
     Disp[9] = 0x1C;
@@ -303,18 +304,7 @@ switch (Display_System_Status)
 
     break;
 
-    case 0x10:      // Редагування хвилин (0 - 59)
-    if (System_time[minutes] <= 0x00)
-        {
-        System_time[minutes] = 59;
-        }
-    else
-        {
-        System_time[minutes]--;
-        }
-    break;
-
-    case 0x11:      // Редагування годин (0 - 23*)
+    case 0x10:      // Редагування годин (0 - 23*)
     if (System_time[hours] <= 0)
         {
         System_time[hours] = 23;
@@ -322,6 +312,17 @@ switch (Display_System_Status)
     else
         {
         System_time[hours]--;
+        }
+    break;
+
+    case 0x11:      // Редагування хвилин (0 - 59)
+    if (System_time[minutes] <= 0x00)
+        {
+        System_time[minutes] = 59;
+        }
+    else
+        {
+        System_time[minutes]--;
         }
     break;
 
@@ -412,18 +413,7 @@ switch (Display_System_Status)
 
     break;
 
-    case 0x10:      // Редагування хвилин (0 - 59)
-    if (System_time[minutes] >= 59)
-        {
-        System_time[minutes] = 0;
-        }
-    else
-        {
-        System_time[minutes]++;
-        }
-    break;
-
-    case 0x11:      // Редагування годин (0 - 23*)
+    case 0x10:      // Редагування годин (0 - 23*)
     if (System_time[hours] >= 23)
         {
         System_time[hours] = 0;
@@ -431,6 +421,17 @@ switch (Display_System_Status)
     else
         {
         System_time[hours]++;
+        }
+    break;
+
+    case 0x11:      // Редагування хвилин (0 - 59)
+    if (System_time[minutes] >= 59)
+        {
+        System_time[minutes] = 0;
+        }
+    else
+        {
+        System_time[minutes]++;
         }
     break;
 
@@ -716,7 +717,7 @@ switch (bttn)
     case 0x10:  // Натиснуті кнопки KL "-" "+"
     if (bttn == 0x10)
         {
-        if(Display_System_Status == 0x10)   // Seconds reset
+        if(Display_System_Status == 0x10 | Display_System_Status == 0x11)   // Seconds reset
             {
             System_time[seconds] = 0x00;
             TCNT1 = 0x0000;
