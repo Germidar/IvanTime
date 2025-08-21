@@ -8,8 +8,10 @@
 #define date    0
 #define month   1
 #define year    2
+#define hYear   4
 
 void SysTime_incr (void);                                       // Підтримка роботи Системного часу
+void isLeap (void);
 
 unsigned char My_SREG = 0b00000101;                             // Системний регістр налаштувань годинника.
                                                                 // bit 0: =1 beep_per_hour ON       | =0 beep_per_hour OFF
@@ -18,13 +20,39 @@ unsigned char My_SREG = 0b00000101;                             // Системний рег
                                                                 // bit 3: =1 autoChange device ON   | =0 autoChange device OFF
 
 
-unsigned char System_time [3] = {8, 23, 17};                      // Годии, хвилини, секунди
-unsigned char System_date [5] = {12, 10, 19, 1, 20};               // Число, Місяць, Рік (десятки), День неділі, Рік (Сотні)
+unsigned char System_time [3] = {8, 23, 17};                    // Годии, хвилини, секунди
+unsigned char System_date [5] = {12, 10, 24, 1, 20};            // Число, Місяць, Рік (десятки), День неділі, Рік (Сотні)
 unsigned char I2C_Buff[9];
 unsigned char Day_in_Mounth[13] = {0xFF, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // Масив днів у місяцях
 //unsigned int Day_in_Mounth = 0b0000101011010101;  Масив днів у компактному режимі
 //                                   0.       F       7     1
 unsigned long beep_permit = 0b00000000001111111111111110000000; // Дозвіл на погодинний сигнал
+/*
+unsigned char isLeap (unsigned char hundredsYear, unsigned char tenYear)
+    {
+    unsigned int fullYear = (unsigned int)hundredsYear * 100 + (unsigned int)tenYear;
+    return (fullYear % 400 == 0) || ((fullYear % 4 == 0) && (fullYear % 100 != 0));
+    }
+*/
+/*    
+unsigned char isLeap (unsigned char hundredsYear, unsigned char tenYear)
+{
+    return (((hundredsYear % 4 == 0) && (tenYear == 0))     // Multiplicity 400
+              || ((tenYear % 4 == 0) && (tenYear != 0)));   // Multiplicity 4, but not 100
+}
+*/
+void isLeap (void)
+{
+if((((System_date[hYear] % 4 == 0) && (System_date[year] == 0))     // Multiplicity 400
+  || ((System_date[year] % 4 == 0) && (System_date[year] != 0))))   // Multiplicity 4, but not 100
+    {
+    Day_in_Mounth[2] = 29;
+    }
+else
+    {
+    Day_in_Mounth[2] = 28;
+    }             
+}
 
 void Get_RTC_time (void)                                                    // Отримання часту з ГРЧ
 {
@@ -44,15 +72,17 @@ System_date[date] = ((0x0F & I2C_Buff[5]) + ((0x70 & I2C_Buff[5])>>4) * 10);    
 System_date[month] = ((0x0F & I2C_Buff[6]) + ((0x70 & I2C_Buff[6])>>4) * 10);       // Місяць
 System_date[year] = ((0x0F & I2C_Buff[7]) + ((0x70 & I2C_Buff[7])>>4) * 10);        // Рік (десятки)
 System_date[day] = I2C_Buff[4];                                                     // День неділі
-
-if (System_date[year] % 4)     // Перевірка на високосний рік
-    {
-    Day_in_Mounth[2] = 28;
-    }
-else
+/*
+if (isLeap(System_date[hYear], System_date[year]))     // Перевірка на високосний рік
     {
     Day_in_Mounth[2] = 29;
     }
+else
+    {
+    Day_in_Mounth[2] = 28;
+    }
+*/
+isLeap();
 #asm("sei")
 }
 
@@ -104,13 +134,23 @@ if (System_time[seconds] > 58)                        // Секунди
                     {
                     System_date[month] = 0x01;
 
-                    if(System_date[year] > 98)                                 // Рік
+                    if(System_date[year] > 98)                                 // Рік десятки
                         {
                         System_date[year] = 0x00;
+                        if(System_date[hYear] > 98)                             // Рік сотні
+                            {
+                            System_date[hYear] = 0;
+                            }
+                        else
+                            {
+                            System_date[hYear]++;
+                            }
+                        isLeap();
                         }
                     else
                         {
                         System_date[year]++;
+                        isLeap();
                         }
                     }
                 else
