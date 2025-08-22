@@ -98,8 +98,8 @@ switch (Display_System_Status)
     // Дисплей року
     Disp[7] = System_date[year] % 10;           //Year ED
     Disp[6] = System_date[year] / 10;           //Year Dec
-    Disp[5] = System_date[4] % 10;              //Year Sot
-    Disp[4] = System_date[4] / 10;              //Year Tis
+    Disp[5] = System_date[hYear] % 10;              //Year Sot
+    Disp[4] = System_date[hYear] / 10;              //Year Tis
     // Індикатор дня тижня
     Disp[8] = System_date[day] + 19;            //Дні неділі;
     Disp[9] = 0x1C;
@@ -175,8 +175,8 @@ switch (Display_System_Status)
     case 0x14:      // Редагування року
     Disp[7] = System_date[year] % 10;           //Year ED
     Disp[6] = System_date[year] / 10;           //Year Dec
-    Disp[5] = System_date[4] % 10;              //Year Sot
-    Disp[4] = System_date[4] / 10;              //Year Tis
+    Disp[5] = System_date[hYear] % 10;              //Year Sot
+    Disp[4] = System_date[hYear] / 10;              //Year Tis
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
     Disp[2] = 0x1C;
@@ -352,13 +352,13 @@ switch (Display_System_Status)
     if (System_date[year] <= 0)
         {
         System_date[year] = 99;
-        if (System_date[4] <= 0)
+        if (System_date[hYear] <= 0)
             {
-            System_date[4] = 99;
+            System_date[hYear] = 99;
             }
         else
             {
-            System_date[4]--;
+            System_date[hYear]--;
             }
         }
     else
@@ -461,13 +461,13 @@ switch (Display_System_Status)
     if (System_date[year] >= 99)
         {
         System_date[year] = 0;
-        if (System_date[4] >= 99)
+        if (System_date[hYear] >= 99)
             {
-            System_date[4] = 0;
+            System_date[hYear] = 0;
             }
         else
             {
-            System_date[4]++;
+            System_date[hYear]++;
             }
         }
     else
