@@ -105,19 +105,19 @@ I2C_Buff[1] = 0x00;
 TWI_SendData(I2C_Buff,9);
 }
 
-void SysTime_incr (void)                        // Системний час
+void SysTime_incr (void)                            // Системний час
 {
-if (System_time[seconds] > 58)                        // Секунди
+if (System_time[seconds] > 58)                      // Секунди
     {
     System_time[seconds] = 0x00;
-    if (System_time[minutes] > 58)                    // Хвилини
+    if (System_time[minutes] > 58)                  // Хвилини
         {
         System_time[minutes] = 0x00;
         if (System_time[hours] > 22)                // Години
             {
             System_time[hours] = 0x00;
 
-            if (System_date[day] > 6)             // День неділі
+            if (System_date[day] > 6)               // День неділі
                 {
                 System_date[day] = 0x01;
                 }
@@ -126,7 +126,7 @@ if (System_time[seconds] > 58)                        // Секунди
                 System_date[day]++;
                 }
 
-            if (System_date[date] >= Day_in_Mounth[System_date[month]])            // Доба (День місяця/Дата)
+            if (System_date[date] >= Day_in_Mounth[System_date[month]])         // Доба (День місяця/Дата)
                 {
                 System_date[date] = 0x01;
 
@@ -134,7 +134,7 @@ if (System_time[seconds] > 58)                        // Секунди
                     {
                     System_date[month] = 0x01;
 
-                    if(System_date[year] > 98)                                 // Рік десятки
+                    if(System_date[year] > 98)                                  // Рік десятки
                         {
                         System_date[year] = 0x00;
                         if(System_date[hYear] > 98)                             // Рік сотні

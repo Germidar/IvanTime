@@ -57,12 +57,12 @@ switch (Display_System_Status)
     {
     case 0x01:
     // Дисплей годинника
-    Disp[3] = System_time[minutes] % 10;    // одиниці хвилин
-    Disp[2] = System_time[minutes] / 10;    // десятки хвилин
-    Disp[1] = System_time[hours] % 10;      // одиниці годин
-    if (My_SREG & 0x02)                     // Відкидання десятків годин, якщо меньше 10 годин.
+    Disp[3] = System_time[minutes] % 10;        // одиниці хвилин
+    Disp[2] = System_time[minutes] / 10;        // десятки хвилин
+    Disp[1] = System_time[hours] % 10;          // одиниці годин
+    if (My_SREG & 0x02)                         // Відкидання десятків годин, якщо меньше 10 годин.
         {
-        Disp[0] = System_time[hours] / 10;  // десятки годин
+        Disp[0] = System_time[hours] / 10;      // десятки годин
         }
     else
         {
@@ -76,20 +76,20 @@ switch (Display_System_Status)
             }
         }
     // Дисплей темератури
-    Disp[7] = Sys_Temp[curr_dev][3];                // Дробова частина
-    Disp[6] = Sys_Temp[curr_dev][2] + 10;           // Одиниці
-    Disp[5] = Sys_Temp[curr_dev][1];                // Десятки
-    Disp[4] = Sys_Temp[curr_dev][0];                // Сотні
+    Disp[7] = Sys_Temp[curr_dev][3];            // Дробова частина
+    Disp[6] = Sys_Temp[curr_dev][2] + 10;       // Одиниці
+    Disp[5] = Sys_Temp[curr_dev][1];            // Десятки
+    Disp[4] = Sys_Temp[curr_dev][0];            // Сотні
 
-    Disp[8] = System_date[day] + 19;                // Дні тижня
-    Disp[9] = 21 + curr_dev;                        // Номер датчика для відображення
-    if (System_time[seconds] % 0x02)                // Блимач
+    Disp[8] = System_date[day] + 19;            // Дні тижня
+    Disp[9] = 21 + curr_dev;                    // Номер датчика для відображення
+    if (System_time[seconds] % 0x02)            // Блимач
         {
         Disp[1] = Disp[1] + 0x0A;
         }
     break;
 
-    case 0x02:                                      // Відображення Числа місяця та року на дислпеї
+    case 0x02:                                  // Відображення Числа місяця та року на дислпеї
     // Дисплей дати
     Disp[3] = System_date[month] % 10;          //Mounth ED
     Disp[2] = System_date[month] / 10;          //Mounth Dec
