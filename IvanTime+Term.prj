@@ -6,7 +6,7 @@ A=
 C=
 D=06.01.2015 18:07:35
 Files=1
-OpenedFiles=6
+OpenedFiles=5
 OutputListFilesDirectory=List
 OutputObjectFilesDirectory=Obj
 OutputExecutableFilesDirectory=Exe
@@ -18,36 +18,36 @@ ActiveEditorPanel=0
 Active0=0
 EditorPanel0=0
 PageIndex0=0
-OF1=IvanTime+Term.c
+OF1=Time_and_Clock.c
 Active1=1
 EditorPanel1=0
-TimeStamp1=1362386412
+TimeStamp1=1528085248
 PageIndex1=1
-ActiveTab=3
+ActiveTab=0
 ActiveBuildConfiguration=0
 DebugOutputListFilesDirectory=Debug\List
 DebugOutputObjectFilesDirectory=Debug
 DebugOutputExecutableFilesDirectory=Debug\Exe
 DebugOutputLinkerFilesDirectory=Debug\Link
-OF2=Time_and_Clock.c
+OF2=timer_mode_manager.c
 Active2=0
 EditorPanel2=0
-TimeStamp2=1330426567
+TimeStamp2=1528141007
 PageIndex2=2
-OF3=timer_mode_manager.c
+OF3=DS18Bxx.c
 Active3=0
 EditorPanel3=0
-TimeStamp3=1330418646
+TimeStamp3=1528141007
 PageIndex3=3
 OF4=Debug\List\IvanTime+Term.map
 Active4=0
 EditorPanel4=0
-TimeStamp4=1362387393
+TimeStamp4=1528196740
 PageIndex4=4
-OF5=Debug\List\IvanTime+Term.asm
+OF5=IvanTime+Term.c
 Active5=0
 EditorPanel5=0
-TimeStamp5=1362387393
+TimeStamp5=1528196733
 PageIndex5=5
 F1=IvanTime+Term.c
 OF6=DS18Bxx.c
@@ -152,7 +152,7 @@ WarningUnknownPragma=1
 LinkerWarnings=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-Build=1382
+Build=1384
 UseEEPROMLocation0=1
 IncludePath0=
 IncludePath1=
@@ -385,7 +385,7 @@ Row=0
 Column=0
 ScrollPosX=0
 ScrollPosY=0
-TimeStamp=1513260474
+TimeStamp=1528208374
 [BookmarksFoldedCode]
 Files=21
 F1=D:\AVR\IvanTime\IvanTime+Term.c
@@ -428,11 +428,11 @@ BK9=-1
 [FoldedCode1]
 Blocks=0
 [Bookmarks2]
-TimeStamp=1528149365
-Row=14
-Column=13
+TimeStamp=1528196733
+Row=521
+Column=12
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=498
 BK0=-1
 BK1=-1
 BK2=-1
@@ -446,7 +446,7 @@ BK9=-1
 [CompilerDebug]
 RebuildAll=0
 LinkageInformationPresent=1
-Build=1382
+Build=1384
 UseEEPROMLocation0=1
 Chip=ATmega8A
 CPUClock=8000000
@@ -543,7 +543,7 @@ WarningStaticRamEepromStorageAllocConstStrLit=0
 WarningRegisterAddressXMEGA=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-COFFileTimeStamp=1528196740
+COFFileTimeStamp=1528209922
 GlobalVarAddr=463
 EEPROMVarAddr=0
 [BuildInfoCompiler]
@@ -563,7 +563,7 @@ L13=Enhanced function parameters passing: Mode 1
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 1382
+L17=Build: 1384
 L18=3148 line(s) compiled
 L19=No errors
 L20=4 warning(s)
@@ -698,11 +698,11 @@ BK9=-1
 [FoldedCode5]
 Blocks=0
 [Bookmarks8]
-TimeStamp=1326974201
-Row=0
-Column=0
+TimeStamp=1528209259
+Row=7
+Column=41
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=3
 BK0=-1
 BK1=-1
 BK2=-1
@@ -731,10 +731,10 @@ BK8=-1
 BK9=-1
 [Bookmarks10]
 TimeStamp=1528085248
-Row=0
-Column=0
+Row=48
+Column=7
 ScrollPosX=0
-ScrollPosY=48
+ScrollPosY=39
 BK0=-1
 BK1=-1
 BK2=-1
@@ -858,7 +858,7 @@ BK9=-1
 [FoldedCode16]
 Blocks=0
 [Bookmarks17]
-TimeStamp=1330418646
+TimeStamp=1528141007
 Row=0
 Column=0
 ScrollPosX=0
@@ -892,11 +892,11 @@ BK7=-1
 BK8=-1
 BK9=-1
 [Bookmarks19]
-TimeStamp=1362387393
-Row=0
-Column=0
+TimeStamp=1528209922
+Row=37
+Column=13
 ScrollPosX=0
-ScrollPosY=0
+ScrollPosY=17
 BK0=-1
 BK1=-1
 BK2=-1
@@ -947,17 +947,11 @@ Blocks=0
 Blocks=0
 [FoldedCode6]
 Blocks=0
-[FoldedCode8]
-Blocks=0
 [FoldedCode18]
 Blocks=0
-[FoldedCode19]
-Blocks=0
-[FoldedCode17]
+[FoldedCode2]
 Blocks=0
 [FoldedCode10]
-Blocks=0
-[FoldedCode2]
 Blocks=0
 [HeadersList]
 Files=1
@@ -975,3 +969,9 @@ F8=timer_mode_manager.c
 F9=Time_and_Clock.c
 F10=1-wire.c
 F11=DS18Bxx.c
+[FoldedCode19]
+Blocks=0
+[FoldedCode8]
+Blocks=0
+[FoldedCode17]
+Blocks=0

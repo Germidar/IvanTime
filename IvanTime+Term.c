@@ -81,9 +81,9 @@ switch (Display_System_Status)
     Disp[5] = Sys_Temp[curr_dev][1];                // Десятки
     Disp[4] = Sys_Temp[curr_dev][0];                // Сотні
 
-    Disp[8] = System_date[day] + 19;                // Дні неділі
+    Disp[8] = System_date[day] + 19;                // Дні тижня
     Disp[9] = 21 + curr_dev;                        // Номер датчика для відображення
-    if (0x00 == System_time[seconds] % 0x02)        // Блимач
+    if (System_time[seconds] % 0x02)                // Блимач
         {
         Disp[1] = Disp[1] + 0x0A;
         }
@@ -98,10 +98,10 @@ switch (Display_System_Status)
     // Дисплей року
     Disp[7] = System_date[year] % 10;           //Year ED
     Disp[6] = System_date[year] / 10;           //Year Dec
-    Disp[5] = System_date[hYear] % 10;              //Year Sot
-    Disp[4] = System_date[hYear] / 10;              //Year Tis
+    Disp[5] = System_date[hYear] % 10;          //Year Sot
+    Disp[4] = System_date[hYear] / 10;          //Year Tis
     // Індикатор дня тижня
-    Disp[8] = System_date[day] + 19;            //Дні неділі;
+    Disp[8] = System_date[day] + 19;            //Дні тижня;
     Disp[9] = 0x1C;
     break;
 
@@ -175,8 +175,8 @@ switch (Display_System_Status)
     case 0x14:      // Редагування року
     Disp[7] = System_date[year] % 10;           //Year ED
     Disp[6] = System_date[year] / 10;           //Year Dec
-    Disp[5] = System_date[hYear] % 10;              //Year Sot
-    Disp[4] = System_date[hYear] / 10;              //Year Tis
+    Disp[5] = System_date[hYear] % 10;          //Year Sot
+    Disp[4] = System_date[hYear] / 10;          //Year Tis
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
     Disp[2] = 0x1C;
@@ -185,8 +185,8 @@ switch (Display_System_Status)
     Disp[9] = 0x1C;
     break;
 
-    case 0x15:      // Встановлення дня неділі
-    Disp[8] = System_date[day] + 19; //Дні неділі
+    case 0x15:      // Встановлення дня тижня
+    Disp[8] = System_date[day] + 19; //Дні тижня
     Disp[0] = 0x1C;
     Disp[1] = 0x1C;
     Disp[2] = 0x1C;
@@ -367,7 +367,7 @@ switch (Display_System_Status)
         }
     break;
 
-    case 0x15:      // Встановлення дня неділі
+    case 0x15:      // Встановлення дня тижня
     if (System_date[day] <= 1)
         {
         System_date[day] = 7;
@@ -476,7 +476,7 @@ switch (Display_System_Status)
         }
     break;
 
-    case 0x15:      // Встановлення дня неділі
+    case 0x15:      // Встановлення дня тижня
     if (System_date[day] >= 7)
         {
         System_date[day] = 1;

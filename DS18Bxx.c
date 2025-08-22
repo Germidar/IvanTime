@@ -1,5 +1,5 @@
 #pragma used+
-unsigned char ROM [3][8];   //  Address find device
+unsigned char ROM [3][8];   // Addresses of found devices (max 3 devices)
 unsigned char Sys_Temp[3][4] = {{28,28,18,28},
                                 {28,28,18,28},
                                 {28,28,18,28}};
