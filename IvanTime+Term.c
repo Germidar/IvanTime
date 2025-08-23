@@ -329,7 +329,7 @@ switch (Display_System_Status)
     case 0x12:      // –едагуванн€ числа м≥с€ц€ (1 - 31*)
     if (System_date[date] <= 1)
         {
-        System_date[date] = Day_in_Mounth[System_date[month]];
+        System_date[date] = 31;
         }
     else
         {
@@ -436,7 +436,7 @@ switch (Display_System_Status)
     break;
 
     case 0x12:      // –едагуванн€ числа м≥с€ц€ (1 - 31*)
-    if (System_date[date] >= Day_in_Mounth[System_date[month]])
+    if (System_date[date] >= 31)
         {
         System_date[date] = 1;
         }
@@ -507,6 +507,15 @@ switch (Display_System_Status)
 Display_refr();
 }
 
+void correctDateInMonth (void)      // Correction max date in month after edit date
+{
+isLeap();
+if (System_date[0] > Day_in_Mounth[System_date[1]])
+    {
+    System_date[0] = Day_in_Mounth[System_date[1]];
+    }
+}
+
 void push_button_M (void)
 {
 switch (Display_System_Status)
@@ -527,6 +536,7 @@ switch (Display_System_Status)
     break;
 
     case 0x15:
+    correctDateInMonth();   // Correct date for currnet month
     Display_System_Status = 0x10;
     break;
 
@@ -567,8 +577,9 @@ switch (Display_System_Status)
         {
         if (buttn_M_hold > 0x09)
             {
-            beep_sound(800,3800);  // —игнал виходу з режиму налаштуваннь
+            correctDateInMonth();
             Set_RTC_time();
+            beep_sound(800,3800);  // —игнал виходу з режиму налаштуваннь
             Display_System_Status = 0x01;
             button_pushed[2] = 0x00;
             button_hold[2] = 0x00;

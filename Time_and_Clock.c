@@ -20,7 +20,7 @@ unsigned char My_SREG = 0b00000101;                             // Системний рег
                                                                 // bit 3: =1 autoChange device ON   | =0 autoChange device OFF
 
 
-unsigned char System_time [3] = {8, 23, 17};                    // Годии, хвилини, секунди
+unsigned char System_time [3] = {8, 23, 17};                    // Hour, Minutes, Seconds
 unsigned char System_date [5] = {12, 10, 24, 1, 20};            // Число, Місяць, Рік (десятки), День неділі, Рік (Сотні)
 unsigned char I2C_Buff[9];
 unsigned char Day_in_Mounth[13] = {0xFF, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // Масив днів у місяцях
