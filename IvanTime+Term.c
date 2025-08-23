@@ -799,7 +799,7 @@ EEPROM_write(0x001B,dta);
 
 void main (void)
 {
-DDRB = 0b10101000;
+DDRB = 0b00101000;
 PORTB = 0b00010110;     // Внутрішні PullUP резистори
 DDRC = 0x0F;
 DDRD = 0xFF; // Segments

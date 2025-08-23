@@ -152,7 +152,7 @@ WarningUnknownPragma=1
 LinkerWarnings=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-Build=1384
+Build=1386
 UseEEPROMLocation0=1
 IncludePath0=
 IncludePath1=
@@ -446,7 +446,7 @@ BK9=-1
 [CompilerDebug]
 RebuildAll=0
 LinkageInformationPresent=1
-Build=1384
+Build=1386
 UseEEPROMLocation0=1
 Chip=ATmega8A
 CPUClock=8000000
@@ -543,7 +543,7 @@ WarningStaticRamEepromStorageAllocConstStrLit=0
 WarningRegisterAddressXMEGA=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-COFFileTimeStamp=1528209922
+COFFileTimeStamp=1528255220
 GlobalVarAddr=463
 EEPROMVarAddr=0
 [BuildInfoCompiler]
@@ -563,7 +563,7 @@ L13=Enhanced function parameters passing: Mode 1
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 1384
+L17=Build: 1386
 L18=3148 line(s) compiled
 L19=No errors
 L20=4 warning(s)
@@ -953,6 +953,12 @@ Blocks=0
 Blocks=0
 [FoldedCode10]
 Blocks=0
+[FoldedCode19]
+Blocks=0
+[FoldedCode8]
+Blocks=0
+[FoldedCode17]
+Blocks=0
 [HeadersList]
 Files=1
 F1=Z:\home\ovo\Documents\virtualProject\IvanTime\IvanTime+Term.c
@@ -969,9 +975,3 @@ F8=timer_mode_manager.c
 F9=Time_and_Clock.c
 F10=1-wire.c
 F11=DS18Bxx.c
-[FoldedCode19]
-Blocks=0
-[FoldedCode8]
-Blocks=0
-[FoldedCode17]
-Blocks=0
