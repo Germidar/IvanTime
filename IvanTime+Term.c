@@ -202,7 +202,7 @@ switch (Display_System_Status)
 
     break;
 
-    case 0x17:     // Edit beep hour sigal
+    case 0x17:     // Edit beep per hour sigal
     Disp[0] = 0x1C;
     if (My_SREG & 0x02)                     // Відкидання десятків годин, якщо меньше 10 годин.
         {
@@ -510,9 +510,9 @@ Display_refr();
 void correctDateInMonth (void)      // Correction max date in month after edit date
 {
 isLeap();
-if (System_date[0] > Day_in_Mounth[System_date[1]])
+if (System_date[date] > Day_in_Mounth[System_date[month]])
     {
-    System_date[0] = Day_in_Mounth[System_date[1]];
+    System_date[date] = Day_in_Mounth[System_date[month]];
     }
 }
 
