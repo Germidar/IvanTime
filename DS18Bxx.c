@@ -18,7 +18,7 @@ void Copy_Scratchpad ();
 void Recall_E ();
 
 void Convert_Temperature();
-void Update_Temperature_data();
+void updateTemperatureData(void);
 unsigned char Read_Power_Supply (void);
 signed int Get_temperature (unsigned char index_device);
 
@@ -196,7 +196,7 @@ return x;
 signed int Get_temperature (unsigned char index_device)
 {
 signed int temperature;
-unsigned char scrp [9];
+unsigned char scrp[9];
 unsigned char scrp_num = 0x00;
 unsigned char chekbyte = 0x00;
 
@@ -225,74 +225,78 @@ if (W1_Reset())
 	}
 }
 
-void Update_Temperature_data(void)
-{
-unsigned char dev_num;                                  // dev_count - Кількість знайдених пристроїв
-signed int vremtemp;
-unsigned char T_integer, T_fraction;
-unsigned char znak = 0x1C;
-
-for (dev_num = 0x00; dev_num < dev_count; dev_num++)
+void updateTemperatureData(void)
     {
-    if (W1_Reset())
+    unsigned char nDevice, nByte;
+    unsigned char scratchpadBuffer[9];
+    signed int temperature;
+    for (nDevice=0;nDevice<dev_count;nDevice++)
         {
-        Match_ROM(dev_num);                             // W1_Tx(0x55);
-		Read_Scratchpad(); 		                        // W1_Tx(0xBE);
-		vremtemp = Get_temperature(dev_num);	        // Зчитуємо 9 байтів з датчика та перевіряємо СRC
-        if (vremtemp == -32768)
+        if (W1_Reset())
             {
-
-            }
-        else
-            {
-            if(vremtemp < 0)
+            Match_ROM(nDevice);                             // W1_Tx(0x55);
+		    Read_Scratchpad(); 		                        // W1_Tx(0xBE);
+            for (nByte=0;nByte<9;nByte++)
                 {
-                vremtemp = (vremtemp ^= 0xFFFF);
-                vremtemp++;
-                znak = 0x1B;
-                }
-            else
-                {
-                znak = 0x1C;
+                scratchpadBuffer[nByte]=W1_Rx(8);           // Read Scratchpad from device
                 }
 
-            T_integer = vremtemp >> 4;
-            T_fraction = 0x000F & vremtemp;
-
-            if (T_integer > 99)
+            if(calc_crc(scratchpadBuffer) == 0)
                 {
-                Sys_Temp[dev_num][0] = T_integer / 100;
-                Sys_Temp[dev_num][1] = (T_integer - 100) / 10;
-                Sys_Temp[dev_num][2] = (T_integer - 100) % 10;
-                }
-            else
-                {
-                if (T_integer > 9)
+                temperature = scratchpadBuffer[0];
+                temperature |= (signed int)scratchpadBuffer[1] << 8;
+                
+                if (temperature >= 0)
                     {
-                    Sys_Temp[dev_num][0] = znak;
-                    Sys_Temp[dev_num][1] = T_integer / 10;
-                    Sys_Temp[dev_num][2] = T_integer % 10;
+                    scratchpadBuffer[0] = 0x1C;
+                    nByte = 0x000F & temperature;
+                    temperature = temperature >> 4; 
                     }
                 else
                     {
-                    Sys_Temp[dev_num][0] = 0x1C;
-                    Sys_Temp[dev_num][1] = znak;
-                    Sys_Temp[dev_num][2] = T_integer;
+                    scratchpadBuffer[0] = 0x1B; // variable for hundreds (or sign)
+                    temperature ^= 0xFFFF;
+                    temperature++;
+                    nByte = 0x000F & temperature;
+                    temperature = temperature >> 4;
                     }
+                
+                if (temperature > 99)
+                    {
+                    Sys_Temp[nDevice][0] = temperature / 100;
+                    Sys_Temp[nDevice][1] = (temperature - 100) / 10;
+                    Sys_Temp[nDevice][2] = (temperature - 100) % 10;
+                    }
+                else
+                    {
+                    if (temperature > 9)
+                        {
+                        Sys_Temp[nDevice][0] = scratchpadBuffer[0];
+                        Sys_Temp[nDevice][1] = temperature / 10;
+                        Sys_Temp[nDevice][2] = temperature % 10;
+                        }
+                    else
+                        {
+                        Sys_Temp[nDevice][0] = 0x1C;
+                        Sys_Temp[nDevice][1] = scratchpadBuffer[0];
+                        Sys_Temp[nDevice][2] = temperature;
+                        }
+                    }
+                Sys_Temp[nDevice][3] = (625 * nByte) / 1000;
                 }
-            Sys_Temp[dev_num][3] = (T_fraction * 0.625);    // Десяткова частина температури
+            else
+                {
+                // Crc Error
+                }
+            }
+        else
+            {
+            Sys_Temp[nDevice][0] = 0x1C;
+            Sys_Temp[nDevice][1] = 0x1C;
+            Sys_Temp[nDevice][2] = 0x12;
+            Sys_Temp[nDevice][3] = 0x1C;
             }
         }
-    else
-        {
-        Sys_Temp[dev_num][0] = 0x1C;
-        Sys_Temp[dev_num][1] = 0x1C;
-        Sys_Temp[dev_num][2] = 0x12;
-        Sys_Temp[dev_num][3] = 0x1C;
-        }
-
     }
-
-}
 
 #pragma used-

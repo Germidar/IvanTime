@@ -1,0 +1,86 @@
+unsigned char newSearchROM(void)
+    {
+    unsigned char firstCollision = 128, lastCollision, nByte, nBit, nDevice = 0;
+    bit searchDirection = 1, searching = 1;
+    clear_ROM();
+    while(searching)
+        {
+        if (nDevice < MAX_TEMP_DEVICES)
+            {
+            if (W1_Reset())
+                {
+                W1_Tx(0xF0);    // Sending SEARCH ROM COMMAND to 1-Wire bus
+                for (nByte=0x00;nByte<8;nByte++)
+                    {
+                    for (nBit=0x00;nBit<8;nBit++)
+                        {
+                        switch (W1_Rx(2))
+                            {
+                            case 0x00:
+                            if (firstCollision == 128)
+                                {
+                                firstCollision = nByte * 8 + nBit;
+                                lastCollision = firstCollision;
+                                
+                                }
+                            else
+                                {
+                                if(lastCollision > nByte * 8 + nBit)
+                                    {
+                                    
+                                    }
+                                else
+                                    {
+                                    lastCollision = nByte * 8 + nBit;
+                                    }
+                                
+                                }
+                            
+                            if (searchDirection)
+                                {
+                                ROM[nDevice][nByte] |= 0x01 << nBit;
+                                W1_Tx_bit(searchDirection);
+                                }
+                            else
+                                {
+                                ROM[nDevice][nByte] |= 0x00 << nBit;
+                                W1_Tx_bit(searchDirection);
+                                }
+                            
+                            break;
+
+                            case 0x01:  // Device with 1 on current bit
+                            ROM[nDevice][nByte] |= 0x01 << nBit;
+                            W1_Tx_bit(searchDirection);
+                            break;
+
+                            case 0x02:  // Device with 0 on current bit
+                            ROM[nDevice][nByte] |= 0x00 << nBit;
+                            W1_Tx_bit(searchDirection);
+                            break;
+
+                            default:    // Bus error (no device responded)
+                            nByte = 9;
+                            nBit = 9;
+                            break;
+                            }
+                        }
+                    }
+                if (nByte < 9)
+                    {
+                    nDevice++;
+                    }
+                }
+            else
+                {
+                nDevice = 0;
+                searching = 0;
+                }
+            }
+        else
+            {
+            searching = 0;
+            }
+        }    
+    return nDevice;
+    }

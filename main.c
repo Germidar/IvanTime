@@ -860,8 +860,8 @@ while(1)
     if (Display_System_Status < 10)
         {
         if (rt_sec > refr_temp_dev)
-        	{
-            Update_Temperature_data();  // Оновити температуру данними з пристроїв
+        	{ 
+            updateTemperatureData();    // Оновити температуру данними з пристроїв
             rt_sec = 0x00;		        // chiki-piki need 0x01
             conv_need = 0xFF;
         	Display_refr();
