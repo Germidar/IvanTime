@@ -403,7 +403,7 @@ void push_button_L (void)
 switch (Display_System_Status)
     {
     case 0x01:
-    if ((curr_dev + 1) < dev_count) // dev_count
+    if ((curr_dev + 1) < devicesFound) // Count of found devices
         {
         curr_dev++;
         }
@@ -849,7 +849,7 @@ if(PINB.4)
 TWI_MasterInit(100);
 Get_RTC_time();
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
-dev_count = searchROM(0xF0, MAX_TEMP_DEVICES);
+devicesFound = searchROM(0xF0, MAX_TEMP_DEVICES);
 TIMSK=0x11; // був - 91 потім 11
 
 

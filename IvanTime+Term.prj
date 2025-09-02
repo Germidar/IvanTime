@@ -152,7 +152,7 @@ WarningUnknownPragma=1
 LinkerWarnings=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-Build=1495
+Build=1507
 UseEEPROMLocation0=1
 IncludePath0=
 IncludePath1=
@@ -446,7 +446,7 @@ BK9=-1
 [CompilerDebug]
 RebuildAll=0
 LinkageInformationPresent=1
-Build=1495
+Build=1507
 UseEEPROMLocation0=1
 Chip=ATmega8A
 CPUClock=8000000
@@ -543,7 +543,7 @@ WarningStaticRamEepromStorageAllocConstStrLit=0
 WarningRegisterAddressXMEGA=1
 DebugBootLoader=0
 WatchAVR8LAutoVariables=0
-COFFileTimeStamp=1528987024
+COFFileTimeStamp=1528997496
 GlobalVarAddr=463
 EEPROMVarAddr=0
 [BuildInfoCompiler]
@@ -563,8 +563,8 @@ L13=Enhanced function parameters passing: Mode 1
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 1495
-L18=3277 line(s) compiled
+L17=Build: 1507
+L18=3170 line(s) compiled
 L19=No errors
 L20=4 warning(s)
 L21=
@@ -589,7 +589,7 @@ Lines=37
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=Z:\home\ovo\Documents\virtualProject\IvanTime\Debug\List\IvanTime+Term.asm(5858): No EEPROM data, deleting Z:\home\ovo\Documents\virtualProject\IvanTime\Debug\Exe\IvanTime+Term.eep
+L4=Z:\home\ovo\Documents\virtualProject\IvanTime\Debug\List\IvanTime+Term.asm(5848): No EEPROM data, deleting Z:\home\ovo\Documents\virtualProject\IvanTime\Debug\Exe\IvanTime+Term.eep
 L5=
 L6=ATmega8A memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
@@ -698,11 +698,11 @@ BK9=-1
 [FoldedCode5]
 Blocks=0
 [Bookmarks8]
-TimeStamp=1528986990
-Row=0
-Column=0
+TimeStamp=1528996531
+Row=259
+Column=56
 ScrollPosX=0
-ScrollPosY=75
+ScrollPosY=220
 BK0=-1
 BK1=-1
 BK2=-1
@@ -945,6 +945,21 @@ Blocks=0
 Blocks=0
 [FoldedCode18]
 Blocks=0
+[FoldedCode2]
+Blocks=0
+[FoldedCode20]
+Blocks=0
+[FoldedCode19]
+Blocks=0
+[FoldedCode9]
+Blocks=0
+[FoldedCode17]
+Blocks=0
+[FoldedCode10]
+Line1=75
+Blocks=1
+[FoldedCode8]
+Blocks=0
 [HeadersList]
 Files=1
 F1=Z:\home\ovo\Documents\virtualProject\IvanTime\main.c
@@ -961,18 +976,3 @@ F8=timer_mode_manager.c
 F9=Time_and_Clock.c
 F10=1-wire.c
 F11=DS18Bxx.c
-[FoldedCode2]
-Blocks=0
-[FoldedCode20]
-Blocks=0
-[FoldedCode19]
-Blocks=0
-[FoldedCode9]
-Blocks=0
-[FoldedCode17]
-Blocks=0
-[FoldedCode8]
-Blocks=0
-[FoldedCode10]
-Line1=75
-Blocks=1

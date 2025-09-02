@@ -5,11 +5,9 @@ unsigned char Sys_Temp[MAX_TEMP_DEVICES][4] = {{28,28,18,28},
                                 {28,28,18,28},
                                 {28,28,18,28}};
 
-unsigned char dev_count;
+unsigned char devicesFound; // variable for count of found devices
 
 unsigned char searchROM(unsigned char searchCmd, unsigned char maxDevices);
-unsigned char Search_ROM ();
-void Read_ROM (void);
 void Match_ROM (unsigned ROM_number);
 void Skip_ROM (void);
 void Alarm_Search ();
@@ -22,7 +20,6 @@ void Recall_E ();
 void Convert_Temperature();
 void updateTemperatureData(void);
 unsigned char Read_Power_Supply (void);
-signed int Get_temperature (unsigned char index_device);
 
 unsigned char calc_crc (unsigned char *mas)
 {
@@ -171,87 +168,6 @@ unsigned char searchROM(unsigned char searchCmd, unsigned char maxDevices)
     return foundDevices;
     }
 
-unsigned char Search_ROM ()
-{
-unsigned char rBit, count_bit = 0x00, count_byte = 0x00, dualbit = 0x00;
-dev_count = 0x00;
-clearROM();
-newpoisk:
-if (W1_Reset())
-    {
-    W1_Tx(0xF0);
-    for (count_byte = 0x00; count_byte < 8; count_byte++)
-        {
-        for (count_bit = 0x00; count_bit < 8; count_bit++)
-            {
-            rBit = W1_Rx(2);
-
-            switch (rBit)
-                {
-                case 0x00:
-                dualbit = (count_byte * 8) + count_bit;
-                if (dev_count == 0x00)
-                    {
-                    ROM[dev_count][count_byte] |= 0x00 << count_bit;
-                    W1_Tx_bit(0x00);
-                    }
-                else
-                    {
-                    ROM[dev_count][count_byte] |= 0x01 << count_bit;
-                    W1_Tx_bit(0x01);
-                    }
-                break;
-
-                case 0x01:
-                ROM[dev_count][count_byte] |= 0x01 << count_bit;
-                W1_Tx_bit(0x01);
-                break;
-
-                case 0x02:
-                ROM[dev_count][count_byte] |= 0x00 << count_bit;
-                W1_Tx_bit(0x00);
-                break;
-
-                case 0x03:
-                // Помилка на шині (жодний пристрій не відповів)
-                dev_count = 0xFF;
-                count_byte = 0x00;
-                count_bit = 0x00;
-                break;
-
-                default:
-
-                }
-            }
-        }
-    if (dev_count != 0xFF)
-        {
-        dev_count++;
-        }
-
-    if ((dualbit > 0x00) & (dev_count == 0x01))
-        {
-        goto newpoisk;
-        }
-    }
-else
-    {
-    dev_count = 0x00;   // No Device
-    }
-return dev_count;
-}
-
-void Read_ROM (void)                                // Читання ROM-коду пристрою (у випадку якщо один на шині)
-{
-unsigned char x = 0x00;
-W1_Tx(0x33);
-while(x<8)
-    {
-    ROM[2][x] = W1_Rx(8);   // temp in debug
-    x++;
-    }
-}
-
 void Match_ROM (unsigned ROM_number)                // Звернення до конктретного пристрою на шині
 {
 unsigned char rom_byte;
@@ -307,29 +223,6 @@ x = W1_Rx(0x01);
 return x;
 }
 
-signed int Get_temperature (unsigned char index_device)
-{
-signed int temperature;
-unsigned char scrp[9];
-unsigned char scrp_num = 0x00;
-unsigned char chekbyte = 0x00;
-
-while(scrp_num < 9)
-    {
-    scrp[scrp_num] = W1_Rx(8);
-    scrp_num++;
-    }
-temperature = scrp[1] << 8;
-temperature |= 0x00FF & scrp[0];
-
-chekbyte = calc_crc(scrp);
-if (chekbyte)
-    {
-    temperature = -32768;
-    }
-return temperature;
-}
-
 void Convert_Temperature(void)
 {
 if (W1_Reset())
@@ -344,7 +237,7 @@ void updateTemperatureData(void)
     unsigned char nDevice, nByte;
     unsigned char scratchpadBuffer[9];
     signed int temperature;
-    for (nDevice=0;nDevice<dev_count;nDevice++)
+    for (nDevice=0;nDevice<devicesFound;nDevice++)
         {
         if (W1_Reset())
             {
