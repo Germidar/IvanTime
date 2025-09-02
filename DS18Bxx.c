@@ -1,11 +1,13 @@
 #pragma used+
-unsigned char ROM [3][8];   // Addresses of found devices (max 3 devices)
-unsigned char Sys_Temp[3][4] = {{28,28,18,28},
+#define MAX_TEMP_DEVICES 3
+unsigned char ROM [MAX_TEMP_DEVICES][8];   // Addresses of found devices
+unsigned char Sys_Temp[MAX_TEMP_DEVICES][4] = {{28,28,18,28},
                                 {28,28,18,28},
                                 {28,28,18,28}};
 
 unsigned char dev_count;
 
+unsigned char searchROM(unsigned char searchCmd, unsigned char maxDevices);
 unsigned char Search_ROM ();
 void Read_ROM (void);
 void Match_ROM (unsigned ROM_number);
@@ -44,11 +46,11 @@ while (st_byt != 9);            // счетчик байтов в массиве
 return crc;
 }
 
-void clear_ROM (void)
+void clearROM (void)
 {
 unsigned char a, b;
 
-for (a = 0x00; a < 3; a++)
+for (a = 0x00; a < MAX_TEMP_DEVICES; a++)
     {
     for (b = 0x00; b < 8; b++)
         {
@@ -57,11 +59,123 @@ for (a = 0x00; a < 3; a++)
     }
 }
 
+unsigned char searchROM(unsigned char searchCmd, unsigned char maxDevices)
+    {
+    unsigned char foundDevices = 0;
+    unsigned char rom[8];
+    unsigned char lastDiscrepancy = 0;
+    unsigned char lastDeviceFlag = 0;
+    unsigned char discrepancyMarker, bitNumber, byteNumber, bitMask;
+    unsigned char bitA, bitB, bitToWrite;
+    unsigned char i;
+    
+    clearROM();
+
+    while (!lastDeviceFlag && foundDevices < maxDevices)
+        {
+        if (!W1_Reset())
+            {
+            // Якщо шина пуста — завершити пошук
+            break;
+            }
+
+        W1_Tx(searchCmd);  // Команда пошуку: 0xF0 або 0xEC
+
+        discrepancyMarker = 0;
+        bitNumber = 1;
+        byteNumber = 0;
+        bitMask = 1;
+
+        for (i = 0; i < 8; i++)
+            {
+            rom[i] = 0;
+            }
+
+        // Перебираємо 64 біти ROM коду
+        while (bitNumber <= 64)
+            {
+            bitA = W1_Rx(1);
+            bitB = W1_Rx(1);
+
+            if (bitA == 1 && bitB == 1)
+                {
+                // Немає відповіді на шині
+                return foundDevices;
+                }
+
+            if (bitA == 0 && bitB == 0)
+                {
+                // Конфлікт — обидва біти 0
+                if (bitNumber < lastDiscrepancy)
+                    {
+                    bitToWrite = (ROM[foundDevices - 1][byteNumber] & bitMask) ? 1 : 0;
+                    }
+                else 
+                    {
+                    if (bitNumber == lastDiscrepancy)
+                        {
+                        bitToWrite = 1;
+                        } 
+                    else
+                        {
+                        bitToWrite = 0;
+                        }
+                    }
+
+                if (bitToWrite == 0)
+                    {
+                    discrepancyMarker = bitNumber;
+                    }
+                }
+            else
+                {
+                bitToWrite = bitA;
+                }
+
+            // Записуємо обраний біт у ROM
+            if (bitToWrite)
+                {
+                rom[byteNumber] |= bitMask;
+                }
+            else
+                {
+                rom[byteNumber] &= ~bitMask;
+                }
+
+            W1_Tx_bit(bitToWrite);  // Надсилаємо біт на шину
+
+            // Переходимо до наступного біту
+            bitNumber++;
+            bitMask <<= 1;
+            if (bitMask == 0)
+                {
+                bitMask = 1;
+                byteNumber++;
+                }
+            }
+
+        // Копіюємо ROM у глобальний масив
+        for (i = 0; i < 8; i++)
+            {
+            ROM[foundDevices][i] = rom[i];
+            }
+        foundDevices++;
+        lastDiscrepancy = discrepancyMarker;
+
+        if (lastDiscrepancy == 0)
+            {
+            lastDeviceFlag = 1;
+            }
+        }
+
+    return foundDevices;
+    }
+
 unsigned char Search_ROM ()
 {
 unsigned char rBit, count_bit = 0x00, count_byte = 0x00, dualbit = 0x00;
 dev_count = 0x00;
-clear_ROM();
+clearROM();
 newpoisk:
 if (W1_Reset())
     {
