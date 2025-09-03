@@ -17,7 +17,7 @@ void Read_Scratchpad ();
 void Copy_Scratchpad ();
 void Recall_E ();
 
-void Convert_Temperature();
+void convertTemperature();
 void updateTemperatureData(void);
 unsigned char Read_Power_Supply (void);
 
@@ -223,7 +223,7 @@ x = W1_Rx(0x01);
 return x;
 }
 
-void Convert_Temperature(void)
+void convertTemperature(void)
 {
 if (W1_Reset())
 	{

@@ -13,17 +13,17 @@ flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 
 
 unsigned char Display_System_Status = 0x01;
 unsigned char xscr;
-unsigned char bttn;                     // Для нового алгоритму обробки кнопок
-unsigned char p_bttn = 0x00;            // Змінна натиснутих кнопок
+unsigned char bttn;                             // Для нового алгоритму обробки кнопок
+unsigned char p_bttn = 0x00;                    // Змінна натиснутих кнопок
 unsigned char button_pushed[3];
 unsigned char button_hold[3];
-unsigned char rt_sec = 0x08;            // Час піся останнього оновлення температури
-unsigned char refr_temp_dev = 0x09;     // період оновлення датчиків температури
-unsigned char timeToChangeDev = 0x05;   // час перемикання з одного датчика на інший
-unsigned char buttn_M_hold;             // час утримування кнопки M для переходу до режиму налажтуваннь
-unsigned char display_refresh = 0xFF;   // період оновлення дисплею
-unsigned char curr_dev = 0x00;          // Номер датчика температури для відображення
-unsigned char conv_need = 0xFF;         // Прапорець необхідності виконання конвертації температури датчиками
+unsigned char lastTemperatureUpdate;            // Час останнього оновлення температури у секундах
+unsigned char temperatureRefreshPeriod = 5;     // Update temperature time (in seconds 1 ... 255)
+unsigned char timeToChangeDev = 0x05;           // час перемикання з одного датчика на інший
+unsigned char buttn_M_hold;                     // час утримування кнопки M для переходу до режиму налажтуваннь
+unsigned char display_refresh = 0xFF;           // період оновлення дисплею
+unsigned char curr_dev = 0x00;                  // Номер датчика температури для відображення
+unsigned char conv_need = 0xFF;                 // Прапорець необхідності виконання конвертації температури датчиками
 unsigned char TMP = 0x00;
 unsigned int  TEMP = 0x00;
 
@@ -31,7 +31,7 @@ void save_settings_to_eeprom ();
 void load_settings_from_eeprom ();
 void reset_system (void)
 {
-#asm("rjmp 0") //test_program_reset
+#asm("rjmp 0")  //test_program_reset
 }
 
 void EEPROM_write (unsigned int uiAddress, unsigned char ucData)
@@ -243,7 +243,7 @@ switch (Display_System_Status)
 
 void SysTemp_incr (void)
 {
-rt_sec++;
+lastTemperatureUpdate++;
 //timeToDisplayDevice++;
 }
 
@@ -768,7 +768,7 @@ void load_settings_from_eeprom (void)
 My_SREG =           EEPROM_read(0x0010);
 cfg_pwm =           EEPROM_read(0x0011);
 buttn_M_hold =      EEPROM_read(0x0012);
-refr_temp_dev =     EEPROM_read(0x0013);
+temperatureRefreshPeriod =     EEPROM_read(0x0013);
 //var_1 =           EEPROM_read(0x0014);
 //var_2 =           EEPROM_read(0x0015);
 //abval =           EEPROM_read(0x0016);
@@ -792,7 +792,7 @@ unsigned char dta = 0xFF;
 EEPROM_write(0x0010,My_SREG);
 EEPROM_write(0x0011,cfg_pwm);
 EEPROM_write(0x0012,buttn_M_hold);
-EEPROM_write(0x0013,refr_temp_dev);
+EEPROM_write(0x0013,temperatureRefreshPeriod);
 //EEPROM_write(0x0014,var);
 //EEPROM_write(0x0015,var);
 //EEPROM_write(0x0016,abval);
@@ -850,6 +850,7 @@ TWI_MasterInit(100);
 Get_RTC_time();
 Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
 devicesFound = searchROM(0xF0, MAX_TEMP_DEVICES);
+lastTemperatureUpdate = temperatureRefreshPeriod - 1;   // Protect refresh temperature before temperature convertation
 TIMSK=0x11; // був - 91 потім 11
 
 
@@ -857,23 +858,30 @@ while(1)
     {
     button_manager();
 
-    if (Display_System_Status < 10)
+    if(Display_System_Status < 10)
         {
-        if (rt_sec > refr_temp_dev)
-        	{ 
-            updateTemperatureData();    // Оновити температуру данними з пристроїв
-            rt_sec = 0x00;		        // chiki-piki need 0x01
-            conv_need = 0xFF;
-        	Display_refr();
+        if(devicesFound > 0)
+            {
+            if((conv_need == 0xFF) && (lastTemperatureUpdate >= (temperatureRefreshPeriod-1)))
+                {
+                convertTemperature();           // Sent ConvertTemperature command to 1-Wire bus
+                conv_need = 0x00;
+                }
+            else
+                {
+                if (lastTemperatureUpdate >= temperatureRefreshPeriod)
+                    {
+                    updateTemperatureData();    // Оновити температуру данними з пристроїв
+                    lastTemperatureUpdate = 0x00;
+                    conv_need = 0xFF;
+                    Display_refr();
+                    }
+                }
             }
         else
-        	{
-        	if (conv_need && (rt_sec >= refr_temp_dev))   // + прапорець запуску конвертування температури.
-                {
-        		Convert_Temperature();                  // Convert T
-                conv_need = 0x00;
-        		}
-        	}
+            {
+            devicesFound = searchROM(0xF0, MAX_TEMP_DEVICES);
+            }
 		}
     }
 }
