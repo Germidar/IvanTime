@@ -5,7 +5,7 @@
 #include <Time_and_Clock.c>
 #include <1-wire.c>
 #include <DS18Bxx.c>
-
+#include <stopwatchAndTimer.c>
 
 unsigned char Disp[10];      //  0     1     2     3     4     5     6     7     8     9     0.    1.    2.    3.    4.    5.    6.    7.    8.    9.    Пн    Вт    Ср    Чт    Пт    Сб    Нд    -    " "
 flash unsigned char simv[29] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0xBF, 0x86, 0xDB, 0xCF, 0xE6, 0xED, 0xFD, 0x87, 0xFF, 0xEF, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x40, 0x00};     //Оголошення масиву символів від 0 до 9 СC
@@ -102,6 +102,32 @@ switch (Display_System_Status)
     Disp[4] = System_date[hYear] / 10;          //Year Tis
     // Індикатор дня тижня
     Disp[8] = System_date[day] + 19;            //Дні тижня;
+    Disp[9] = 0x1C;
+    break;
+    
+    case 0x03:      // Timer mode
+    Disp[0] = tH / 10;
+    Disp[1] = tH % 10;
+    Disp[2] = tM / 10;
+    Disp[3] = tM % 10;
+    Disp[4] = 0x1C;
+    Disp[5] = tS / 10;
+    Disp[6] = tS % 10;
+    Disp[7] = 0x1C;
+    Disp[8] = 0x17;
+    Disp[9] = 0x1C;
+    break;
+    
+    case 0x04:      // Stopwatch mode
+    Disp[0] = sH / 10;
+    Disp[1] = sH % 10;
+    Disp[2] = sM / 10;
+    Disp[3] = sM % 10;
+    Disp[4] = 0x1C;
+    Disp[5] = sS / 10;
+    Disp[6] = sS % 10;
+    Disp[7] = 0x1C;
+    Disp[8] = 0x17;
     Disp[9] = 0x1C;
     break;
 
@@ -286,7 +312,14 @@ interrupt [TIM1_COMPA] void timer1_compa_isr(void)  // 1000 ms
 SysTime_incr();     // Функція ходу годинника
 SysTemp_incr();     // Інкремент для опитування датчиків температури
 Display_refr();     // Оновлення буферу даних для дисплею
-
+if(isTimerRunning)
+    {
+    timerDecrement();
+    }
+if (isStopwatchRunning)
+    {
+    stopwatchIncrement();
+    }
 }
 
 void push_button_K (void)
@@ -302,6 +335,20 @@ switch (Display_System_Status)
 
     case 0x02:      // Відображення Числа місяця та року на дислпеї
 
+    break;
+    
+    case 0x03:      // Increase minutes in the timer
+    if (!isTimerRunning)
+        {
+        if (tH <= 0)
+            {
+            tH = 23;
+            }
+        else
+            {
+            tH--;
+            }
+        }
     break;
 
     case 0x10:      // Редагування годин (0 - 23*)
@@ -412,6 +459,20 @@ switch (Display_System_Status)
     case 0x02:      // Відображення Числа місяця та року на дислпеї
 
     break;
+    
+    case 0x03:      // Increase minutes in the timer
+    if (!isTimerRunning)
+        {
+        if (tM >= 59)
+            {
+            tM = 0;
+            }
+        else
+            {
+            tM++;
+            }
+        }
+    break; 
 
     case 0x10:      // Редагування годин (0 - 23*)
     if (System_time[hours] >= 23)
@@ -528,15 +589,23 @@ switch (Display_System_Status)
     if (button_pushed[2] > 0xFE)
         {
         Display_System_Status = 0x10;
-        beep_sound(800,3800);  // Сигнал для режиму налаштуваннь
+        beep_sound(800,3800);   // Сигнал для режиму налаштуваннь
         button_pushed[2] = 0x00;
         button_hold[2] = 0x00;
         buttn_M_hold = 0x00;
         }
     break;
-
+    
+    case 0x03:
+    isTimerRunning ^= 1;        // Stop/Start timer
+    break;
+    
+    case 0x04:
+    isStopwatchRunning ^= 1;    // Stop/Start stopwatch
+    break;
+    
     case 0x15:
-    correctDateInMonth();   // Correct date for currnet month
+    correctDateInMonth();       // Correct date for currnet month
     Display_System_Status = 0x10;
     break;
 
@@ -616,15 +685,30 @@ switch (bttn)
         button_hold[1] = 0x00;
         button_hold[2] = 0x00;
         buttn_M_hold = 0x00;
-        if (Display_System_Status == 0x02)
+        
+        switch (Display_System_Status)
             {
+            case 0x02:
             Display_System_Status = 0x01;
             Display_refr();
+            break;
+
+            case 0x03:
+            Display_refr();
+            break;
+            
+            case 0x04:
+            Display_refr();
+            break;
+                           
+            default:
+            if (Display_System_Status < 0x10)
+                {
+                Display_System_Status = 0x01;
+                }                           
             }
-        if (Display_System_Status < 0x10)
-            {
-            Display_System_Status = 0x01;
-            }
+
+        
         }
     break;
 
@@ -661,7 +745,7 @@ switch (bttn)
 
     case 0x12:  // Натиснута кнопка L "+"
     if (bttn == 0x12)
-        {
+        {    
         if (p_bttn == 0x02)
             {
             if (button_hold[1] > 0xD0)
@@ -728,21 +812,58 @@ switch (bttn)
     case 0x10:  // Натиснуті кнопки KL "-" "+"
     if (bttn == 0x10)
         {
-        if(Display_System_Status == 0x10 | Display_System_Status == 0x11)   // Seconds reset
+        switch (Display_System_Status)
             {
-            System_time[seconds] = 0x00;
-            TCNT1 = 0x0000;
-            Display_refr();
+            case 0x03:
+            if (!isTimerRunning)
+                {
+                tH=0;
+                tM=0;
+                tS=0;
+                }
+            break;
+
+            case 0x04:
+            if (!isStopwatchRunning)
+                {
+                sH=0;
+                sM=0;
+                sS=0;
+                }
+            break;
+                           
+            default:
+            if(Display_System_Status == 0x10 | Display_System_Status == 0x11)   // Seconds reset
+                {
+                System_time[seconds] = 0x00;
+                TCNT1 = 0x0000;
+                Display_refr();
+                }
+            break;
             }
+        
+
         }
     break;
 
     case 0x04:  // Натиснуті кнопки KM "-" "Mute/set/option"
     if (bttn == 0x04)
         {
-        if (Display_System_Status > 0x10)   // Перехід у режим коригуваннь щогодинного сигналу
+        switch (Display_System_Status)
             {
-            Display_System_Status = 0x17;
+            case 0x02:
+            Display_System_Status = 0x03;   // Enter to Timer mode
+            break;
+
+            case 0x03:
+            Display_System_Status = 0x02;   // Exit from Timer mode
+            break;
+                           
+            default:
+            if (Display_System_Status > 0x10)   // Перехід у режим коригуваннь щогодинного сигналу
+                {
+                Display_System_Status = 0x17;
+                }       
             }
         }
     break;
@@ -750,7 +871,16 @@ switch (bttn)
     case 0x02:  // Натиснуті кнопки LM "+" "Mute/set/option"
     if (bttn == 0x02)
         {
+        switch (Display_System_Status)
+            {
+            case 0x02:
+            Display_System_Status = 0x04;    // Enter stopwatch mode
+            break;
 
+            case 0x04:
+            Display_System_Status = 0x02;    // Exit from stopwatch mode
+            break;
+            }
         }
     break;
 
@@ -852,6 +982,9 @@ Display_refr();     // Для запобігання виведення нулів при увімкненні живлення
 devicesFound = searchROM(0xF0, MAX_TEMP_DEVICES);
 lastTemperatureUpdate = temperatureRefreshPeriod - 1;   // Protect refresh temperature before temperature convertation
 TIMSK=0x11; // був - 91 потім 11
+tH=72;
+tM=0;
+tS=0;
 
 
 while(1)

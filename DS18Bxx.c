@@ -1,5 +1,6 @@
 #pragma used+
 #define MAX_TEMP_DEVICES 3
+#include <globals.h>
 unsigned char ROM [MAX_TEMP_DEVICES][8];   // Addresses of found devices
 unsigned char Sys_Temp[MAX_TEMP_DEVICES][4] = {{28,28,18,28},
                                 {28,28,18,28},
@@ -246,7 +247,7 @@ void updateTemperatureData(void)
             for (nByte=0;nByte<9;nByte++)
                 {
                 scratchpadBuffer[nByte]=W1_Rx(8);           // Read Scratchpad from device
-                }
+                }                
 
             if(calc_crc(scratchpadBuffer) == 0)
                 {
@@ -293,15 +294,21 @@ void updateTemperatureData(void)
                 }
             else
                 {
-                // Crc Error
+                // Crc sum Error
+                Sys_Temp[nDevice][0] = 0x1C;
+                Sys_Temp[nDevice][1] = 0x1C;
+                Sys_Temp[nDevice][2] = 0x12;
+                Sys_Temp[nDevice][3] = 0x1C;
                 }
             }
         else
             {
-            Sys_Temp[nDevice][0] = 0x1C;
-            Sys_Temp[nDevice][1] = 0x1C;
-            Sys_Temp[nDevice][2] = 0x12;
-            Sys_Temp[nDevice][3] = 0x1C;
+            // No response from devices on 1-wire bus
+            // Retry postpone update get temperature data 
+            nDevice = devicesFound;
+            devicesFound = 0;
+            conv_need = 0xFF;
+            lastTemperatureUpdate = temperatureRefreshPeriod - 1;
             }
         }
     }
