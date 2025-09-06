@@ -108,6 +108,11 @@ switch (Display_System_Status)
     case 0x03:      // Timer mode
     Disp[0] = tH / 10;
     Disp[1] = tH % 10;
+    if (tS % 2)
+        {
+        Disp[1] = Disp[1] + 0x0A;
+        }
+    //Disp[1] = tH % 10;
     Disp[2] = tM / 10;
     Disp[3] = tM % 10;
     Disp[4] = 0x1C;
@@ -121,6 +126,10 @@ switch (Display_System_Status)
     case 0x04:      // Stopwatch mode
     Disp[0] = sH / 10;
     Disp[1] = sH % 10;
+    if (sS % 2)
+        {
+        Disp[1] = Disp[1] + 0x0A;
+        }
     Disp[2] = sM / 10;
     Disp[3] = sM % 10;
     Disp[4] = 0x1C;
@@ -337,12 +346,12 @@ switch (Display_System_Status)
 
     break;
     
-    case 0x03:      // Increase minutes in the timer
+    case 0x03:      // Decrease hours in the timer
     if (!isTimerRunning)
         {
         if (tH <= 0)
             {
-            tH = 23;
+            tH = 99;
             }
         else
             {
